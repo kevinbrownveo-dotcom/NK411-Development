@@ -5,12 +5,50 @@ export interface User {
   fullName: string;
   full_name?: string;
   role: UserRole;
+  role_id?: string;
+  role_name?: string;
+  role_label?: string;
   department?: string;
   position?: string;
   last_login?: string;
+  is_active?: boolean;
+  auth_source?: 'local' | 'ldap';
+  login_attempts?: number;
+  locked_until?: string | null;
+  permissions?: string[]; // 'resource:action' format
+  created_at?: string;
 }
 
-export type UserRole = 'admin' | 'risk_manager' | 'asset_owner' | 'incident_coordinator' | 'auditor' | 'dxeit_rep';
+export type UserRole = 'admin' | 'risk_manager' | 'asset_owner' | 'incident_coordinator' | 'auditor' | 'dxeit_rep' | string;
+
+// Admin — Rol
+export interface Role {
+  id: string;
+  name: string;
+  label: string;
+  is_system: boolean;
+  is_custom: boolean;
+  description?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RolePermission {
+  id: string;
+  role_id: string;
+  resource: string;
+  action: 'create' | 'read' | 'update' | 'delete';
+}
+
+// LDAP Qrup Mapping
+export interface LdapGroupMapping {
+  id: string;
+  ldap_group_dn: string;
+  ldap_group_label?: string;
+  role_id: string;
+  role_name?: string;
+  role_label?: string;
+}
 
 // Auth
 export interface AuthState {

@@ -16,12 +16,26 @@ import { reconciliationRouter } from './routes/reconciliations';
 import { auditLogRouter } from './routes/auditLog';
 import { dashboardRouter } from './routes/dashboard';
 import { consequenceRouter } from './routes/consequences';
+import { adminRouter } from './routes/admin';
 import { logger } from './utils/logger';
 
 dotenv.config();
 
+// ── Kritik env yoxlaması ──────────────────────────────────────
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET || JWT_SECRET === 'dev-secret-key' || JWT_SECRET.length < 32) {
+  logger.warn('⚠️  JWT_SECRET ya yoxdur, ya çox qısadır, ya da default dəyərdədir. Production üçün mütləq dəyişin!');
+}
+if (!process.env.DB_PASSWORD || process.env.DB_PASSWORD === 'postgres') {
+  logger.warn('⚠️  DB_PASSWORD default dəyərdədir. Production üçün dəyişin!');
+}
+
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// nginx reverse proxy arxasında işlədiyindən trust proxy aktiv et
+// (express-rate-limit X-Forwarded-For başlığını düzgün oxumaq üçün)
+app.set('trust proxy', 1);
 
 // Security middleware
 app.use(helmet());
@@ -30,9 +44,9 @@ app.use(cors({
   credentials: true,
 }));
 
-// Rate limiting
+// Global rate limiting (hər 15 dəq 100 sorğu)
 app.use(rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 dəqiqə
+  windowMs: 15 * 60 * 1000,
   max: 100,
   standardHeaders: true,
   legacyHeaders: false,
@@ -56,6 +70,7 @@ app.use('/api/reconciliations', reconciliationRouter);
 app.use('/api/consequences', consequenceRouter);
 app.use('/api/audit-log', auditLogRouter);
 app.use('/api/dashboard', dashboardRouter);
+app.use('/api/admin', adminRouter);
 
 // Health check
 app.get('/api/health', (_req, res) => {

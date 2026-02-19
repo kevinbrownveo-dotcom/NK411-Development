@@ -4,11 +4,12 @@ import {
   DashboardOutlined, SafetyOutlined, BugOutlined, ExclamationCircleOutlined,
   AlertOutlined, ToolOutlined, FileProtectOutlined, AuditOutlined,
   DatabaseOutlined, SwapOutlined, LogoutOutlined, UserOutlined,
-  LaptopOutlined,
-  NodeIndexOutlined,
+  LaptopOutlined, NodeIndexOutlined,
+  TeamOutlined, SafetyCertificateOutlined, ApiOutlined, SettingOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { usePermission } from '../../hooks/usePermission';
 
 const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
@@ -22,26 +23,43 @@ const ROLE_LABELS: Record<string, string> = {
   dxeit_rep: 'DXƏIT Nümayəndəsi',
 };
 
-const menuItems = [
-  { key: '/', icon: <DashboardOutlined />, label: 'Dashboard' },
-  { key: '/assets', icon: <LaptopOutlined />, label: 'Aktivlər' },
-  { key: '/assets-map', icon: <NodeIndexOutlined />, label: 'Aktiv Xəritəsi (D3)' },
-  { key: '/threats', icon: <AlertOutlined />, label: 'Təhdidlər' },
-  { key: '/vulnerabilities', icon: <BugOutlined />, label: 'Boşluqlar' },
-  { key: '/risks', icon: <ExclamationCircleOutlined />, label: 'Risklər' },
-  { key: '/incidents', icon: <SafetyOutlined />, label: 'İnsidentlər' },
-  { key: '/solutions', icon: <ToolOutlined />, label: 'Həllər' },
-  { key: '/requirements', icon: <FileProtectOutlined />, label: 'Tələblər və Hədlər' },
-  { key: '/reconciliations', icon: <SwapOutlined />, label: 'Uzlaşdırma' },
-  { key: '/audit', icon: <AuditOutlined />, label: 'Audit Jurnalı' },
-];
-
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
+  const { isAdmin } = usePermission();
   const { token: themeToken } = theme.useToken();
+
+  const baseMenuItems = [
+    { key: '/', icon: <DashboardOutlined />, label: 'Dashboard' },
+    { key: '/assets', icon: <LaptopOutlined />, label: 'Aktivlər' },
+    { key: '/assets-map', icon: <NodeIndexOutlined />, label: 'Aktiv Xəritəsi (D3)' },
+    { key: '/threats', icon: <AlertOutlined />, label: 'Təhdidlər' },
+    { key: '/vulnerabilities', icon: <BugOutlined />, label: 'Boşluqlar' },
+    { key: '/risks', icon: <ExclamationCircleOutlined />, label: 'Risqlər' },
+    { key: '/incidents', icon: <SafetyOutlined />, label: 'İnsidentlər' },
+    { key: '/solutions', icon: <ToolOutlined />, label: 'Həllər' },
+    { key: '/requirements', icon: <FileProtectOutlined />, label: 'Tələblər və Hədlər' },
+    { key: '/reconciliations', icon: <SwapOutlined />, label: 'Uzlaşdırma' },
+    { key: '/audit', icon: <AuditOutlined />, label: 'Audit Jurnalı' },
+  ];
+
+  const adminMenuItems = isAdmin() ? [
+    { type: 'divider' as const },
+    {
+      key: 'admin',
+      icon: <SettingOutlined />,
+      label: 'Admin Panel',
+      children: [
+        { key: '/admin/users', icon: <TeamOutlined />, label: 'İstifadəçilər' },
+        { key: '/admin/roles', icon: <SafetyCertificateOutlined />, label: 'Rollar & İcazələr' },
+        { key: '/admin/ldap', icon: <ApiOutlined />, label: 'LDAP / AD' },
+      ],
+    },
+  ] : [];
+
+  const menuItems = [...baseMenuItems, ...adminMenuItems];
 
   const userMenuItems = [
     {

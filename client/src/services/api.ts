@@ -50,3 +50,33 @@ api.interceptors.response.use(
 );
 
 export default api;
+
+// ── Admin API namespace ──────────────────────────────────────
+export const adminApi = {
+  // İstifadəçilər
+  getUsers: (params?: Record<string, unknown>) => api.get('/admin/users', { params }),
+  getUser: (id: string) => api.get(`/admin/users/${id}`),
+  createUser: (data: Record<string, unknown>) => api.post('/admin/users', data),
+  updateUser: (id: string, data: Record<string, unknown>) => api.put(`/admin/users/${id}`, data),
+  deleteUser: (id: string) => api.delete(`/admin/users/${id}`),
+  assignRole: (id: string, role_id: string) => api.post(`/admin/users/${id}/assign-role`, { role_id }),
+  resetPassword: (id: string, new_password?: string) =>
+    api.post(`/admin/users/${id}/reset-password`, new_password ? { new_password } : {}),
+  unlockUser: (id: string) => api.post(`/admin/users/${id}/unlock`),
+
+  // Rollar
+  getRoles: () => api.get('/admin/roles'),
+  getRole: (id: string) => api.get(`/admin/roles/${id}`),
+  createRole: (data: Record<string, unknown>) => api.post('/admin/roles', data),
+  updateRole: (id: string, data: Record<string, unknown>) => api.put(`/admin/roles/${id}`, data),
+  deleteRole: (id: string) => api.delete(`/admin/roles/${id}`),
+  getRolePermissions: (id: string) => api.get(`/admin/roles/${id}/permissions`),
+  updateRolePermissions: (id: string, permissions: { resource: string; action: string }[]) =>
+    api.put(`/admin/roles/${id}/permissions`, { permissions }),
+
+  // LDAP
+  getLdapMappings: () => api.get('/admin/ldap/group-mappings'),
+  createLdapMapping: (data: Record<string, unknown>) => api.post('/admin/ldap/group-mappings', data),
+  deleteLdapMapping: (id: string) => api.delete(`/admin/ldap/group-mappings/${id}`),
+  testLdap: () => api.post('/admin/ldap/test'),
+};

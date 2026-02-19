@@ -38,7 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
       setState({
-        user: { ...data, fullName: data.full_name },
+        user: { ...data, fullName: data.full_name, permissions: data.permissions || [] },
         accessToken: token,
         isAuthenticated: true,
         loading: false,
@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('accessToken', data.accessToken);
     localStorage.setItem('refreshToken', data.refreshToken);
     setState({
-      user: { ...user, fullName: user.fullName || user.full_name },
+      user: { ...user, fullName: user.fullName || user.full_name, permissions: data.permissions || [] },
       accessToken: data.accessToken,
       isAuthenticated: true,
       loading: false,
