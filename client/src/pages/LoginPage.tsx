@@ -16,7 +16,11 @@ export default function LoginPage() {
     try {
       await login(values.email, values.password);
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Giriş zamanı xəta baş verdi');
+      const msg = err.response?.data?.error
+        || err.message
+        || 'Giriş zamanı xəta baş verdi';
+      setError(msg);
+      console.error('Login error:', err);
     } finally {
       setLoading(false);
     }
