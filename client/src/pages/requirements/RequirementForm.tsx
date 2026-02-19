@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Modal, Form, Input, Select, message } from 'antd';
 import api from '../../services/api';
 import { Requirement } from '../../types';
+import FieldLabelWithHelp from '../../components/common/FieldLabelWithHelp';
 
 interface RequirementFormProps {
   visible: boolean;
@@ -89,7 +90,7 @@ export default function RequirementForm({ visible, record, onClose, onSuccess, a
           ]} />
         </Form.Item>
 
-        <Form.Item name="source_type" label="Mənbə növü" rules={[{ required: true }]}> 
+        <Form.Item name="source_type" label={<FieldLabelWithHelp fieldKey="requirements.source_type" label="Mənbə növü" required />} rules={[{ required: true }]}> 
           <Select options={[
             { value: 'normativ_akt', label: 'normativ_akt' },
             { value: 'standart', label: 'standart' },
@@ -104,7 +105,7 @@ export default function RequirementForm({ visible, record, onClose, onSuccess, a
           <Input />
         </Form.Item>
 
-        <Form.Item name="activity_area" label="Fəaliyyət sahəsi" rules={[{ required: true, type: 'array', min: 1 }]}> 
+        <Form.Item name="activity_area" label={<FieldLabelWithHelp fieldKey="requirements.activity_area" label="Fəaliyyət sahəsi" required />} rules={[{ required: true, type: 'array', min: 1 }]}> 
           <Select mode="multiple" options={ACTIVITY_AREA_OPTIONS} />
         </Form.Item>
 

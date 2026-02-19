@@ -1,0 +1,380 @@
+{
+  "assets.name": {
+    "ui_label_az": "Aktiv Adı",
+    "help_text_az": "Aktivin təşkilat daxilində tanınan, unikal adını daxil edin. Ad qısa və aydın olmalıdır.",
+    "allowed_values": null,
+    "legal_ref": "Qayda §4.2.2.1, §4.2",
+    "pdf_page": 42,
+    "pdf_anchor": "Aktivlərin identifikasiyası",
+    "example_az": "Mərkəzi Firewall Klasteri"
+  },
+  "assets.category": {
+    "ui_label_az": "Kateqoriya",
+    "help_text_az": "Aktivi əsas və ya dəstəkləyici olaraq seçin. Bu seçim risk dəyərləndirməsinə təsir edir.",
+    "allowed_values": ["əsas", "dəstəkləyici"],
+    "legal_ref": "Qayda §4.2.2.1",
+    "pdf_page": 43,
+    "pdf_anchor": "Aktiv kateqoriyaları",
+    "example_az": "əsas"
+  },
+  "assets.sub_category": {
+    "ui_label_az": "Alt Kateqoriya",
+    "help_text_az": "Aktivin texniki/əməliyyat tipini ən yaxın alt kateqoriya ilə göstərin.",
+    "allowed_values": ["informasiya", "hardware", "software", "şəbəkə", "insan", "fiziki"],
+    "legal_ref": "Qayda §4.2.2.1",
+    "pdf_page": 43,
+    "pdf_anchor": "Alt kateqoriya",
+    "example_az": "software"
+  },
+  "assets.value": {
+    "ui_label_az": "Dəyər",
+    "help_text_az": "Aktivin biznes və əməliyyat dəyərini 1-5 intervalında qiymətləndirin.",
+    "allowed_values": ["1", "2", "3", "4", "5"],
+    "legal_ref": "Qayda §4.2",
+    "pdf_page": 44,
+    "pdf_anchor": "Aktiv dəyəri",
+    "example_az": "4"
+  },
+  "assets.criticality": {
+    "ui_label_az": "Kritiklik",
+    "help_text_az": "Kritiklik səviyyəsini təsirin dərinliyinə görə seçin.",
+    "allowed_values": ["çox_aşağı", "aşağı", "orta", "yüksək", "kritik"],
+    "legal_ref": "Qayda §4.2",
+    "pdf_page": 44,
+    "pdf_anchor": "Kritiklik",
+    "example_az": "yüksək"
+  },
+  "assets.location": {
+    "ui_label_az": "Məkan",
+    "help_text_az": "Aktivin fiziki və ya məntiqi yerləşməsini qeyd edin.",
+    "allowed_values": null,
+    "legal_ref": "Qayda §4.2",
+    "pdf_page": 44,
+    "pdf_anchor": "Aktivin yerləşməsi",
+    "example_az": "DC-1 / Bakı"
+  },
+  "assets.last_review": {
+    "ui_label_az": "Son baxış tarixi",
+    "help_text_az": "Aktiv məlumatının son dəfə təsdiqləndiyi tarixi daxil edin.",
+    "allowed_values": null,
+    "legal_ref": "Qayda §4.2",
+    "pdf_page": 45,
+    "pdf_anchor": "Baxış dövriliyi",
+    "example_az": "2026-02-01"
+  },
+  "threats.category": {
+    "ui_label_az": "Kateqoriya",
+    "help_text_az": "Təhdidin təbiətinə uyğun kateqoriyanı seçin.",
+    "allowed_values": ["texniki", "fiziki", "insani", "prosessual", "xarici"],
+    "legal_ref": "Qayda §3, §4.2.2.2",
+    "pdf_page": 30,
+    "pdf_anchor": "Təhdid kateqoriyaları",
+    "example_az": "texniki"
+  },
+  "threats.source": {
+    "ui_label_az": "Mənbə",
+    "help_text_az": "Təhdidin daxili, xarici və ya hər iki mənbədən yarandığını seçin.",
+    "allowed_values": ["kənardan", "daxildən", "hər_ikisi"],
+    "legal_ref": "Qayda §3",
+    "pdf_page": 31,
+    "pdf_anchor": "Təhdid mənbəyi",
+    "example_az": "kənardan"
+  },
+  "threats.purpose": {
+    "ui_label_az": "Məqsədi",
+    "help_text_az": "Təhdidin hədəfini və niyyətini məqsəd kimi qeyd edin, bir neçə dəyər seçilə bilər.",
+    "allowed_values": null,
+    "legal_ref": "Qayda §4.2.2.2",
+    "pdf_page": 31,
+    "pdf_anchor": "Təhdidin məqsədi",
+    "example_az": "məlumat sızdırılması"
+  },
+  "threats.target_type": {
+    "ui_label_az": "Ünvan obyekti",
+    "help_text_az": "Təhdidin yönəldiyi obyekt növünü seçin.",
+    "allowed_values": ["struktur", "infrastruktur_komponenti", "konfiqurasiya", "proses", "subyekt"],
+    "legal_ref": "Qayda §4.2.2.2",
+    "pdf_page": 31,
+    "pdf_anchor": "Təhdidin hədəfi",
+    "example_az": "infrastruktur_komponenti"
+  },
+  "threats.intentionality": {
+    "ui_label_az": "Məqsədyönlülük",
+    "help_text_az": "Təhdidin qərəzli, təsadüfi və ya axın üzrə olduğunu seçin.",
+    "allowed_values": ["qərəzli", "təsadüfi", "axın_üzrə"],
+    "legal_ref": "Qayda §4.2.2.2",
+    "pdf_page": 32,
+    "pdf_anchor": "Məqsədyönlülük",
+    "example_az": "qərəzli"
+  },
+  "threats.severity": {
+    "ui_label_az": "Ciddilik",
+    "help_text_az": "5 pilləli şkalaya əsasən ciddiliyi seçin.",
+    "allowed_values": ["çox_aşağı", "aşağı", "orta", "yüksək", "kritik"],
+    "legal_ref": "Qayda §4.2.2.2",
+    "pdf_page": 32,
+    "pdf_anchor": "Ciddilik şkalası",
+    "example_az": "orta"
+  },
+  "threats.probability_band_law": {
+    "ui_label_az": "Ehtimal (% band)",
+    "help_text_az": "Ehtimalı qanun üzrə faiz bandına uyğun seçin.",
+    "allowed_values": ["p01_20", "p21_40", "p41_60", "p61_80", "p81_100"],
+    "legal_ref": "Qayda §4.2.2.2",
+    "pdf_page": 33,
+    "pdf_anchor": "Ehtimal bandları",
+    "example_az": "p41_60"
+  },
+  "threats.realization_tech": {
+    "ui_label_az": "Reallaşma texnologiyası",
+    "help_text_az": "Təhdidin hansı texnika və vasitələrlə reallaşa biləcəyini qısa təsvir edin.",
+    "allowed_values": null,
+    "legal_ref": "Qayda §5.5.2",
+    "pdf_page": 34,
+    "pdf_anchor": "Reallaşma texnologiyası",
+    "example_az": "phishing + credential stuffing"
+  },
+  "threats.is_external": {
+    "ui_label_az": "DXƏIT mənbə flag",
+    "help_text_az": "Təhdid mənbəyi xarici/dövlət bildirişinə istinad edirsə bu flag aktiv olur.",
+    "allowed_values": ["true", "false"],
+    "legal_ref": "Qayda §5.5.2",
+    "pdf_page": 34,
+    "pdf_anchor": "DXƏIT mənbəsi",
+    "example_az": "true"
+  },
+  "vulnerabilities.type": {
+    "ui_label_az": "Boşluq növü",
+    "help_text_az": "Boşluğun xarakterinə ən uyğun növü seçin.",
+    "allowed_values": ["boşluq", "nəzarətsizlik", "zəiflik", "uyğunsuzluq"],
+    "legal_ref": "Qayda §4.2.2.4",
+    "pdf_page": 52,
+    "pdf_anchor": "Boşluq təsnifatı",
+    "example_az": "zəiflik"
+  },
+  "vulnerabilities.asset_id": {
+    "ui_label_az": "Ünvan aktiv",
+    "help_text_az": "Boşluğun aid olduğu aktiv seçilməlidir.",
+    "allowed_values": null,
+    "legal_ref": "Qayda §4.2.2.4",
+    "pdf_page": 52,
+    "pdf_anchor": "Ünvan aktiv",
+    "example_az": "AST-00021"
+  },
+  "vulnerabilities.severity_internal": {
+    "ui_label_az": "Daxili ciddilik",
+    "help_text_az": "Daxili ciddiliyi seçin və severity_law ilə uyğunluğunu yoxlayın.",
+    "allowed_values": ["az", "orta", "yüksək", "çox_yüksək", "kritik", "fövqəladə"],
+    "legal_ref": "Qayda §4.2.2.4, Əlavə 5.2-5.4",
+    "pdf_page": 53,
+    "pdf_anchor": "Daxili ciddilik",
+    "example_az": "yüksək"
+  },
+  "vulnerabilities.detection_method": {
+    "ui_label_az": "Aşkarlama üsulu",
+    "help_text_az": "Boşluğun hansı kanal/üsulla aşkarlandığını seçin.",
+    "allowed_values": ["audit", "pentest", "özqiymətləndirmə", "dxeit_bildirişi", "insident"],
+    "legal_ref": "Qayda §4.2.2.4",
+    "pdf_page": 54,
+    "pdf_anchor": "Aşkarlama üsulu",
+    "example_az": "audit"
+  },
+  "vulnerabilities.exploitation_status": {
+    "ui_label_az": "İstismar statusu",
+    "help_text_az": "Boşluğun istismar edilib-edilmədiyini status ilə göstərin.",
+    "allowed_values": ["istifadə_olunmayıb", "istifadə_cəhdi", "istifadə_edilib"],
+    "legal_ref": "Qayda §4.2.2.4",
+    "pdf_page": 54,
+    "pdf_anchor": "İstismar statusu",
+    "example_az": "istifadə_olunmayıb"
+  },
+  "vulnerabilities.status": {
+    "ui_label_az": "Remediasiya statusu",
+    "help_text_az": "Remediasiya prosesinin cari vəziyyətini seçin.",
+    "allowed_values": ["açıq", "işdə", "həll_edilib", "risk_kimi_qəbul_edilib"],
+    "legal_ref": "Qayda Əlavə 5.2-5.4",
+    "pdf_page": 55,
+    "pdf_anchor": "Remediasiya statusu",
+    "example_az": "işdə"
+  },
+  "risks.name": {
+    "ui_label_az": "Risk adı / mahiyyəti",
+    "help_text_az": "Riski qısa, ölçülə bilən və biznes təsiri görünən formada adlandırın.",
+    "allowed_values": null,
+    "legal_ref": "Qayda §4.2, §10",
+    "pdf_page": 60,
+    "pdf_anchor": "Riskin identifikasiyası",
+    "example_az": "Kritik servisdə DDoS riski"
+  },
+  "risks.probability_factor": {
+    "ui_label_az": "Ehtimal sahələri",
+    "help_text_az": "Risk ehtimalını hesablamaya daxil edilən faktorlarla qiymətləndirin.",
+    "allowed_values": null,
+    "legal_ref": "Qayda §10",
+    "pdf_page": 61,
+    "pdf_anchor": "Ehtimal faktorları",
+    "example_az": "0.65"
+  },
+  "risks.technical_impact": {
+    "ui_label_az": "Təsir sahələri",
+    "help_text_az": "Texniki təsirin miqyasını rəqəmsal dəyər kimi daxil edin.",
+    "allowed_values": null,
+    "legal_ref": "Qayda §10",
+    "pdf_page": 61,
+    "pdf_anchor": "Təsir sahələri",
+    "example_az": "4"
+  },
+  "risks.qualitative_score": {
+    "ui_label_az": "Risk hesablaması sahələri",
+    "help_text_az": "Keyfiyyət skorunu risk metodologiyasına uyğun hesablayın və yoxlayın.",
+    "allowed_values": null,
+    "legal_ref": "Qayda §10",
+    "pdf_page": 62,
+    "pdf_anchor": "Risk hesablaması",
+    "example_az": "16"
+  },
+  "risks.treatment_option": {
+    "ui_label_az": "Emal variantı / üsulu / həlli",
+    "help_text_az": "Risk emalı üçün uyğun variantı seçin: azalt, transfer et, qəbul et və ya aradan qaldır.",
+    "allowed_values": ["azalt", "transfer", "qəbul", "aradan_qaldır"],
+    "legal_ref": "Qayda §10",
+    "pdf_page": 63,
+    "pdf_anchor": "Risk emalı",
+    "example_az": "azalt"
+  },
+  "risks.residual_risk_score": {
+    "ui_label_az": "Qalıq risk",
+    "help_text_az": "Nəzarətlər tətbiqindən sonra qalan riski qalıq skorla qeyd edin.",
+    "allowed_values": null,
+    "legal_ref": "Qayda §10",
+    "pdf_page": 63,
+    "pdf_anchor": "Qalıq risk",
+    "example_az": "8"
+  },
+  "incidents.risk_id": {
+    "ui_label_az": "Əlaqəli risk",
+    "help_text_az": "İnsidenti mövcud risk qeydi ilə əlaqələndirin.",
+    "allowed_values": null,
+    "legal_ref": "Qayda §4.3.4",
+    "pdf_page": 70,
+    "pdf_anchor": "İnsident-risk əlaqəsi",
+    "example_az": "RSK-0021"
+  },
+  "incidents.type": {
+    "ui_label_az": "Növ",
+    "help_text_az": "İnsident növünü standart təsnifata görə seçin.",
+    "allowed_values": null,
+    "legal_ref": "Qayda §6.1.5",
+    "pdf_page": 70,
+    "pdf_anchor": "İnsident növləri",
+    "example_az": "xidmətin dayandırılması"
+  },
+  "incidents.severity": {
+    "ui_label_az": "Ciddilik",
+    "help_text_az": "İnsident prioritetini P1-P4 ciddilik şkalasına əsasən müəyyən edin.",
+    "allowed_values": ["P1_kritik", "P2_yüksək", "P3_orta", "P4_aşağı"],
+    "legal_ref": "Qayda §6.1.5",
+    "pdf_page": 71,
+    "pdf_anchor": "İnsident ciddiliyi",
+    "example_az": "P2_yüksək"
+  },
+  "incidents.detection_datetime": {
+    "ui_label_az": "Zaman sahələri",
+    "help_text_az": "Aşkarlanma vaxtını ISO formatında dəqiq daxil edin.",
+    "allowed_values": null,
+    "legal_ref": "Qayda §6.1.5",
+    "pdf_page": 71,
+    "pdf_anchor": "Zaman qeydiyyatı",
+    "example_az": "2026-02-19T09:30:00"
+  },
+  "incidents.response_option": {
+    "ui_label_az": "Cavab addımları",
+    "help_text_az": "İlkin cavab və eskalasiya addımlarını seçilmiş prosedura uyğun qeyd edin.",
+    "allowed_values": null,
+    "legal_ref": "Qayda §6.9.2",
+    "pdf_page": 72,
+    "pdf_anchor": "Cavab addımları",
+    "example_az": "izolyasiya + xəbərdarlıq"
+  },
+  "incidents.notify_dxeit": {
+    "ui_label_az": "Real-time webhook konteksti",
+    "help_text_az": "DXƏIT bildirişi real-time webhook axınında aktivdirsə flag görünür.",
+    "allowed_values": ["true", "false"],
+    "legal_ref": "Qayda §6.9.2",
+    "pdf_page": 72,
+    "pdf_anchor": "DXƏIT bildirişi",
+    "example_az": "true"
+  },
+  "solutions.type": {
+    "ui_label_az": "Növ",
+    "help_text_az": "Həll növünü risk emalı məqsədinə görə seçin.",
+    "allowed_values": ["qabaqlayıcı", "nəzarətedici", "təshihedici", "bərpaedici"],
+    "legal_ref": "Qayda §5.5.3, §6.2",
+    "pdf_page": 78,
+    "pdf_anchor": "Həll növləri",
+    "example_az": "qabaqlayıcı"
+  },
+  "solutions.source": {
+    "ui_label_az": "Mənbə",
+    "help_text_az": "Həllin daxili, vendor və ya normativ mənbəsini qeyd edin.",
+    "allowed_values": null,
+    "legal_ref": "Qayda §5.5.3",
+    "pdf_page": 79,
+    "pdf_anchor": "Həll mənbələri",
+    "example_az": "vendor"
+  },
+  "solutions.playbook": {
+    "ui_label_az": "Playbook",
+    "help_text_az": "Həllin tətbiq addımlarını playbook/iş təlimatı kimi sənədləşdirin.",
+    "allowed_values": null,
+    "legal_ref": "Qayda §6.2",
+    "pdf_page": 79,
+    "pdf_anchor": "Playbook",
+    "example_az": "PB-SOC-12"
+  },
+  "requirements.source_type": {
+    "ui_label_az": "source_type",
+    "help_text_az": "Tələbin hüquqi və ya normativ mənbə tipini düzgün seçin.",
+    "allowed_values": ["normativ_akt", "standart", "müqavilə", "öhdəlik", "qabaqcıl_təcrübə", "praktik_tələbat"],
+    "legal_ref": "Qayda Əlavə §2",
+    "pdf_page": 18,
+    "pdf_anchor": "Mənbə növləri",
+    "example_az": "normativ_akt"
+  },
+  "requirements.activity_area": {
+    "ui_label_az": "activity_area/principles",
+    "help_text_az": "Tələbin aid olduğu fəaliyyət sahələrini və tətbiq prinsipini seçin.",
+    "allowed_values": null,
+    "legal_ref": "Qayda Əlavə §2",
+    "pdf_page": 19,
+    "pdf_anchor": "Fəaliyyət sahələri",
+    "example_az": "incident_response"
+  },
+  "thresholds.threshold_type": {
+    "ui_label_az": "threshold_type",
+    "help_text_az": "Hədd növünü ölçmə metoduna uyğun təyin edin.",
+    "allowed_values": null,
+    "legal_ref": "Qayda Əlavə §2",
+    "pdf_page": 19,
+    "pdf_anchor": "Hədlər",
+    "example_az": "risk_tolerance"
+  },
+  "dashboard.kpi": {
+    "ui_label_az": "KPI-lar",
+    "help_text_az": "KPI göstəriciləri risk idarəetməsinin effektivliyini izləmək üçün istifadə olunur.",
+    "allowed_values": null,
+    "legal_ref": "Qayda §10",
+    "pdf_page": 84,
+    "pdf_anchor": "KPI",
+    "example_az": "KPI-1: 82%"
+  },
+  "dashboard.dxeit_export": {
+    "ui_label_az": "DXƏIT export",
+    "help_text_az": "DXƏIT üçün çıxarışlar standart format və dövriliklə təqdim edilməlidir.",
+    "allowed_values": null,
+    "legal_ref": "Qayda §8.1.5",
+    "pdf_page": 85,
+    "pdf_anchor": "DXƏIT export",
+    "example_az": "CSV aylıq çıxarış"
+  }
+}

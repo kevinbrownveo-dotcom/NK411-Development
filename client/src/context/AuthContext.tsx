@@ -33,6 +33,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     try {
       const { data } = await api.get('/auth/me');
+      if (localStorage.getItem('accessToken') !== token) {
+        return;
+      }
       setState({
         user: { ...data, fullName: data.full_name },
         accessToken: token,
@@ -40,8 +43,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loading: false,
       });
     } catch {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
+      if (localStorage.getItem('accessToken') === token) {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+      }
       setState({ user: null, accessToken: null, isAuthenticated: false, loading: false });
     }
   }, []);

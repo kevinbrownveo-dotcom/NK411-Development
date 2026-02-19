@@ -10,6 +10,7 @@ import {
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import type { ColumnType } from 'antd/es/table/interface';
 import api from '../../services/api';
+import { getFieldHelp } from '../../help/registry';
 
 const { Title } = Typography;
 
@@ -32,6 +33,7 @@ export default function CrudPage<T extends { id: string }>({
   title, apiPath, columns, formComponent: FormComponent,
   canCreate = true, canDelete = true,
 }: CrudPageProps<T>) {
+  const exportHelp = getFieldHelp('dashboard.dxeit_export');
   const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 20, total: 0 });
@@ -267,7 +269,7 @@ export default function CrudPage<T extends { id: string }>({
             allowClear
           />
           <Button icon={<UploadOutlined />} onClick={handleImportClick}>CSV Import</Button>
-          <Button icon={<ExportOutlined />} onClick={handleExport}>CSV Export</Button>
+          <Button icon={<ExportOutlined />} onClick={handleExport} title={exportHelp?.help_text_az}>CSV Export</Button>
           <Button icon={<ReloadOutlined />} onClick={() => fetchData(pagination.current, pagination.pageSize, search)} />
           {canCreate && FormComponent && (
             <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>

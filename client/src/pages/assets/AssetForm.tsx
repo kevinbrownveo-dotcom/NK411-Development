@@ -3,6 +3,7 @@ import { Modal, Form, Input, Select, InputNumber, DatePicker, message } from 'an
 import dayjs from 'dayjs';
 import api from '../../services/api';
 import { Asset } from '../../types';
+import FieldLabelWithHelp from '../../components/common/FieldLabelWithHelp';
 
 interface AssetFormProps {
   visible: boolean;
@@ -73,11 +74,11 @@ export default function AssetForm({ visible, record, onClose, onSuccess, apiPath
       destroyOnClose
     >
       <Form form={form} layout="vertical">
-        <Form.Item name="name" label="Ad" rules={[{ required: true, message: 'Ad məcburidir' }]}>
+        <Form.Item name="name" label={<FieldLabelWithHelp fieldKey="assets.name" label="Ad" required />} rules={[{ required: true, message: 'Ad məcburidir' }]}>
           <Input />
         </Form.Item>
 
-        <Form.Item name="category" label="Kateqoriya" rules={[{ required: true }]}> 
+        <Form.Item name="category" label={<FieldLabelWithHelp fieldKey="assets.category" label="Kateqoriya" required />} rules={[{ required: true }]}> 
           <Select
             options={[
               { value: 'əsas', label: 'əsas' },
@@ -86,7 +87,7 @@ export default function AssetForm({ visible, record, onClose, onSuccess, apiPath
           />
         </Form.Item>
 
-        <Form.Item name="sub_category" label="Alt kateqoriya" rules={[{ required: true }]}> 
+        <Form.Item name="sub_category" label={<FieldLabelWithHelp fieldKey="assets.sub_category" label="Alt kateqoriya" required />} rules={[{ required: true }]}> 
           <Select
             options={[
               { value: 'informasiya', label: 'informasiya' },
@@ -99,11 +100,11 @@ export default function AssetForm({ visible, record, onClose, onSuccess, apiPath
           />
         </Form.Item>
 
-        <Form.Item name="value" label="Dəyər (1-5)" rules={[{ required: true }]}> 
+        <Form.Item name="value" label={<FieldLabelWithHelp fieldKey="assets.value" label="Dəyər (1-5)" required />} rules={[{ required: true }]}> 
           <InputNumber min={1} max={5} style={{ width: '100%' }} />
         </Form.Item>
 
-        <Form.Item name="criticality" label="Kritiklik" rules={[{ required: true }]}> 
+        <Form.Item name="criticality" label={<FieldLabelWithHelp fieldKey="assets.criticality" label="Kritiklik" required />} rules={[{ required: true }]}> 
           <Select
             options={[
               { value: 'çox_aşağı', label: 'çox_aşağı' },
@@ -115,7 +116,7 @@ export default function AssetForm({ visible, record, onClose, onSuccess, apiPath
           />
         </Form.Item>
 
-        <Form.Item name="location" label="Yerləşmə" rules={[{ required: true }]}> 
+        <Form.Item name="location" label={<FieldLabelWithHelp fieldKey="assets.location" label="Yerləşmə" required />} rules={[{ required: true }]}> 
           <Input />
         </Form.Item>
 
@@ -130,7 +131,7 @@ export default function AssetForm({ visible, record, onClose, onSuccess, apiPath
           />
         </Form.Item>
 
-        <Form.Item name="last_review" label="Son baxış tarixi" rules={[{ required: true }]}> 
+        <Form.Item name="last_review" label={<FieldLabelWithHelp fieldKey="assets.last_review" label="Son baxış tarixi" required />} rules={[{ required: true }]}> 
           <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" />
         </Form.Item>
 

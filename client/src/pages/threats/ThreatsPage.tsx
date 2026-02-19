@@ -3,6 +3,7 @@ import { Tag, Progress } from 'antd';
 import CrudPage from '../../components/common/CrudPage';
 import { Threat } from '../../types';
 import ThreatForm from './ThreatForm';
+import FieldLabelWithHelp from '../../components/common/FieldLabelWithHelp';
 
 const SEVERITY_COLORS: Record<string, string> = {
   kritik: 'red', yüksək: 'orange', orta: 'gold', aşağı: 'green', çox_aşağı: 'blue',
@@ -22,7 +23,7 @@ const columns = [
     render: (v: number) => <Progress percent={v} size="small" />,
   },
   {
-    title: 'DXƏIT', dataIndex: 'is_external', key: 'is_external', width: 80,
+    title: <FieldLabelWithHelp fieldKey="threats.is_external" label="DXƏIT" />, dataIndex: 'is_external', key: 'is_external', width: 80,
     render: (v: boolean) => v ? <Tag color="purple">Bəli</Tag> : null,
   },
 ];

@@ -6,6 +6,7 @@ import {
 } from '@ant-design/icons';
 import api from '../../services/api';
 import { DashboardStats, KpiData } from '../../types';
+import FieldLabelWithHelp from '../../components/common/FieldLabelWithHelp';
 
 const { Title } = Typography;
 
@@ -90,7 +91,7 @@ export default function DashboardPage() {
       {/* KPI kartları — PATCH-07 */}
       <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
         <Col xs={24} sm={12}>
-          <Card title="KPI-1: Qalıq Risk vs Tolerans">
+          <Card title={<FieldLabelWithHelp fieldKey="dashboard.kpi" label="KPI-1: Qalıq Risk vs Tolerans" />}>
             <Statistic
               value={kpi?.kpi1.percentage ?? '—'}
               suffix="%"
@@ -102,7 +103,7 @@ export default function DashboardPage() {
           </Card>
         </Col>
         <Col xs={24} sm={12}>
-          <Card title="KPI-2: İnsident ↔ Qalıq Risk Uyğunluğu">
+          <Card title={<FieldLabelWithHelp fieldKey="dashboard.kpi" label="KPI-2: İnsident ↔ Qalıq Risk Uyğunluğu" />}>
             <Statistic
               value={kpi?.kpi2.percentage ?? '—'}
               suffix="%"

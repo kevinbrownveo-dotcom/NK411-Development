@@ -15,6 +15,7 @@ import SolutionsPage from './pages/solutions/SolutionsPage';
 import RequirementsPage from './pages/requirements/RequirementsPage';
 import ReconciliationsPage from './pages/audit/ReconciliationsPage';
 import AuditLogPage from './pages/audit/AuditLogPage';
+import LegalRiskRegisterRedirect from './pages/legal/LegalRiskRegisterRedirect';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, loading } = useAuth();
@@ -53,6 +54,7 @@ export default function App() {
       <Route path="/requirements" element={<ProtectedRoute><RequirementsPage /></ProtectedRoute>} />
       <Route path="/reconciliations" element={<ProtectedRoute><ReconciliationsPage /></ProtectedRoute>} />
       <Route path="/audit" element={<ProtectedRoute><AuditLogPage /></ProtectedRoute>} />
+      <Route path="/legal/risk-register" element={<LegalRiskRegisterRedirect />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

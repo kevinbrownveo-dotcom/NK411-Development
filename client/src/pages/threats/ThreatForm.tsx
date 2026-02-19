@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Modal, Form, Input, Select, InputNumber, message } from 'antd';
 import api from '../../services/api';
 import { Threat } from '../../types';
+import FieldLabelWithHelp from '../../components/common/FieldLabelWithHelp';
 
 interface ThreatFormProps {
   visible: boolean;
@@ -87,7 +88,7 @@ export default function ThreatForm({ visible, record, onClose, onSuccess, apiPat
           <Input />
         </Form.Item>
 
-        <Form.Item name="category" label="Kateqoriya" rules={[{ required: true }]}>
+        <Form.Item name="category" label={<FieldLabelWithHelp fieldKey="threats.category" label="Kateqoriya" required />} rules={[{ required: true }]}>
           <Select options={[
             { value: 'texniki', label: 'texniki' },
             { value: 'fiziki', label: 'fiziki' },
@@ -97,7 +98,7 @@ export default function ThreatForm({ visible, record, onClose, onSuccess, apiPat
           ]} />
         </Form.Item>
 
-        <Form.Item name="source" label="Mənbə" rules={[{ required: true }]}>
+        <Form.Item name="source" label={<FieldLabelWithHelp fieldKey="threats.source" label="Mənbə" required />} rules={[{ required: true }]}>
           <Select options={[
             { value: 'kənardan', label: 'kənardan' },
             { value: 'daxildən', label: 'daxildən' },
@@ -105,11 +106,11 @@ export default function ThreatForm({ visible, record, onClose, onSuccess, apiPat
           ]} />
         </Form.Item>
 
-        <Form.Item name="purpose" label="Məqsəd (multi)" rules={[{ required: true, message: 'Ən azı 1 məqsəd seçin' }]}>
+        <Form.Item name="purpose" label={<FieldLabelWithHelp fieldKey="threats.purpose" label="Məqsəd (multi)" required />} rules={[{ required: true, message: 'Ən azı 1 məqsəd seçin' }]}>
           <Select mode="tags" tokenSeparators={[',']} />
         </Form.Item>
 
-        <Form.Item name="target_type" label="Hədəf tipi" rules={[{ required: true }]}> 
+        <Form.Item name="target_type" label={<FieldLabelWithHelp fieldKey="threats.target_type" label="Hədəf tipi" required />} rules={[{ required: true }]}> 
           <Select options={[
             { value: 'struktur', label: 'struktur' },
             { value: 'infrastruktur_komponenti', label: 'infrastruktur_komponenti' },
@@ -119,7 +120,7 @@ export default function ThreatForm({ visible, record, onClose, onSuccess, apiPat
           ]} />
         </Form.Item>
 
-        <Form.Item name="intentionality" label="Niyyət" rules={[{ required: true }]}> 
+        <Form.Item name="intentionality" label={<FieldLabelWithHelp fieldKey="threats.intentionality" label="Niyyət" required />} rules={[{ required: true }]}> 
           <Select options={[
             { value: 'qərəzli', label: 'qərəzli' },
             { value: 'təsadüfi', label: 'təsadüfi' },
@@ -127,7 +128,7 @@ export default function ThreatForm({ visible, record, onClose, onSuccess, apiPat
           ]} />
         </Form.Item>
 
-        <Form.Item name="severity" label="Ciddilik" rules={[{ required: true }]}> 
+        <Form.Item name="severity" label={<FieldLabelWithHelp fieldKey="threats.severity" label="Ciddilik" required />} rules={[{ required: true }]}> 
           <Select options={[
             { value: 'çox_aşağı', label: 'çox_aşağı' },
             { value: 'aşağı', label: 'aşağı' },
@@ -151,7 +152,7 @@ export default function ThreatForm({ visible, record, onClose, onSuccess, apiPat
           ]} />
         </Form.Item>
 
-        <Form.Item name="probability_band_law" label="Probability band" rules={[{ required: true }]}> 
+        <Form.Item name="probability_band_law" label={<FieldLabelWithHelp fieldKey="threats.probability_band_law" label="Probability band" required />} rules={[{ required: true }]}> 
           <Select options={[
             { value: 'p01_20', label: 'p01_20' },
             { value: 'p21_40', label: 'p21_40' },
@@ -165,7 +166,7 @@ export default function ThreatForm({ visible, record, onClose, onSuccess, apiPat
           <Select allowClear options={requirements} />
         </Form.Item>
 
-        <Form.Item name="realization_tech" label="Reallaşma texnikası">
+        <Form.Item name="realization_tech" label={<FieldLabelWithHelp fieldKey="threats.realization_tech" label="Reallaşma texnikası" />}>
           <Input.TextArea rows={3} />
         </Form.Item>
       </Form>
