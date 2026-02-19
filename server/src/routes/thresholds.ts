@@ -1,0 +1,8 @@
+import { createCrudRouter } from '../utils/crudFactory';
+
+export const thresholdRouter = createCrudRouter({
+  table: 'thresholds',
+  entityType: 'həd',
+  permissionPrefix: 'thresholds',
+  searchColumns: ['value', 'owner_role'],
+});
