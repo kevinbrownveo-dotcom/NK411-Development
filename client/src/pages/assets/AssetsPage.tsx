@@ -26,5 +26,5 @@ const columns = [
 ];
 
 export default function AssetsPage() {
-  return <CrudPage<Asset> title="Aktiv Kataloqu" apiPath="/assets" columns={columns} formComponent={AssetForm} />;
+  return <CrudPage<Asset> title="Aktiv Kataloqu" apiPath="/assets" columns={columns} formComponent={AssetForm} permissionResource="assets" />;
 }

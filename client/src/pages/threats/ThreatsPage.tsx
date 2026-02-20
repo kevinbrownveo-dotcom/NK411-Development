@@ -29,5 +29,5 @@ const columns = [
 ];
 
 export default function ThreatsPage() {
-  return <CrudPage<Threat> title="Təhdid Kataloqu" apiPath="/threats" columns={columns} formComponent={ThreatForm} />;
+  return <CrudPage<Threat> title="Təhdid Kataloqu" apiPath="/threats" columns={columns} formComponent={ThreatForm} permissionResource="threats" />;
 }

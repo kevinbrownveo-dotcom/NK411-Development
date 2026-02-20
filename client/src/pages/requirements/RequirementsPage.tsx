@@ -25,5 +25,5 @@ const columns = [
 ];
 
 export default function RequirementsPage() {
-  return <CrudPage<Requirement> title="Tələblər və Hədlər" apiPath="/requirements" columns={columns} formComponent={RequirementForm} />;
+  return <CrudPage<Requirement> title="Tələblər və Hədlər" apiPath="/requirements" columns={columns} formComponent={RequirementForm} permissionResource="requirements" />;
 }

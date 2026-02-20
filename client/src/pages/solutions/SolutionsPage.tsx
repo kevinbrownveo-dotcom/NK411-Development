@@ -3,6 +3,7 @@ import { Tag } from 'antd';
 import CrudPage from '../../components/common/CrudPage';
 import { Solution } from '../../types';
 import FieldLabelWithHelp from '../../components/common/FieldLabelWithHelp';
+import SolutionForm from './SolutionForm';
 
 const columns = [
   { title: 'Kod', dataIndex: 'solution_code', key: 'solution_code', width: 150 },
@@ -23,5 +24,5 @@ const columns = [
 ];
 
 export default function SolutionsPage() {
-  return <CrudPage<Solution> title="Həllər Kataloqu" apiPath="/solutions" columns={columns} />;
+  return <CrudPage<Solution> title="Həllər Kataloqu" apiPath="/solutions" columns={columns} formComponent={SolutionForm} permissionResource="solutions" />;
 }

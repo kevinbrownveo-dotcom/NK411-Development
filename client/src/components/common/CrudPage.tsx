@@ -11,6 +11,7 @@ import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import type { ColumnType } from 'antd/es/table/interface';
 import api from '../../services/api';
 import { getFieldHelp } from '../../help/registry';
+import { usePermission } from '../../hooks/usePermission';
 
 const { Title } = Typography;
 
@@ -18,6 +19,7 @@ interface CrudPageProps<T> {
   title: string;
   apiPath: string;
   columns: ColumnsType<T>;
+  permissionResource?: string;
   formComponent?: React.ComponentType<{
     visible: boolean;
     record: T | null;
@@ -25,15 +27,26 @@ interface CrudPageProps<T> {
     onSuccess: () => void;
     apiPath: string;
   }>;
+  canRead?: boolean;
   canCreate?: boolean;
+  canUpdate?: boolean;
   canDelete?: boolean;
+  canImport?: boolean;
+  canExport?: boolean;
 }
 
 export default function CrudPage<T extends { id: string }>({
-  title, apiPath, columns, formComponent: FormComponent,
-  canCreate = true, canDelete = true,
+  title, apiPath, columns, permissionResource, formComponent: FormComponent,
+  canRead, canCreate, canUpdate, canDelete, canImport, canExport,
 }: CrudPageProps<T>) {
   const exportHelp = getFieldHelp('dashboard.dxeit_export');
+  const permission = usePermission();
+  const canReadResource = canRead ?? (permissionResource ? permission.canRead(permissionResource) : true);
+  const canCreateResource = canCreate ?? (permissionResource ? permission.canCreate(permissionResource) : true);
+  const canUpdateResource = canUpdate ?? (permissionResource ? permission.canUpdate(permissionResource) : true);
+  const canDeleteResource = canDelete ?? (permissionResource ? permission.canDelete(permissionResource) : true);
+  const canImportResource = canImport ?? canCreateResource;
+  const canExportResource = canExport ?? canReadResource;
   const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 20, total: 0 });
@@ -119,18 +132,23 @@ export default function CrudPage<T extends { id: string }>({
   }, [apiPath]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (canReadResource) {
+      fetchData();
+    }
+  }, [fetchData, canReadResource]);
 
   const handleTableChange = (pag: TablePaginationConfig) => {
+    if (!canReadResource) return;
     fetchData(pag.current, pag.pageSize, search);
   };
 
   const handleSearch = () => {
+    if (!canReadResource) return;
     fetchData(1, pagination.pageSize, search);
   };
 
   const handleDelete = async (id: string) => {
+    if (!canDeleteResource) return;
     try {
       await api.delete(`${apiPath}/${id}`);
       message.success('Uğurla silindi');
@@ -141,16 +159,19 @@ export default function CrudPage<T extends { id: string }>({
   };
 
   const handleEdit = (record: T) => {
+    if (!canUpdateResource) return;
     setEditRecord(record);
     setFormVisible(true);
   };
 
   const handleCreate = () => {
+    if (!canCreateResource) return;
     setEditRecord(null);
     setFormVisible(true);
   };
 
   const handleExport = () => {
+    if (!canExportResource) return;
     if (!data.length) {
       message.warning('Export üçün məlumat yoxdur');
       return;
@@ -183,6 +204,7 @@ export default function CrudPage<T extends { id: string }>({
   };
 
   const handleImportClick = () => {
+    if (!canImportResource) return;
     fileInputRef.current?.click();
   };
 
@@ -234,10 +256,10 @@ export default function CrudPage<T extends { id: string }>({
       width: 120,
       render: (_: any, record: T) => (
         <Space>
-          {FormComponent && (
+          {FormComponent && canUpdateResource && (
             <Button icon={<EditOutlined />} size="small" onClick={() => handleEdit(record)} />
           )}
-          {canDelete && (
+          {canDeleteResource && (
             <Popconfirm title="Silmək istəyirsiniz?" onConfirm={() => handleDelete(record.id)}>
               <Button icon={<DeleteOutlined />} size="small" danger />
             </Popconfirm>
@@ -246,6 +268,8 @@ export default function CrudPage<T extends { id: string }>({
       ),
     },
   ];
+
+  const showActionColumn = (FormComponent && canUpdateResource) || canDeleteResource;
 
   return (
     <div>
@@ -267,11 +291,12 @@ export default function CrudPage<T extends { id: string }>({
             onPressEnter={handleSearch}
             style={{ width: 250 }}
             allowClear
+            disabled={!canReadResource}
           />
-          <Button icon={<UploadOutlined />} onClick={handleImportClick}>CSV Import</Button>
-          <Button icon={<ExportOutlined />} onClick={handleExport} title={exportHelp?.help_text_az}>CSV Export</Button>
-          <Button icon={<ReloadOutlined />} onClick={() => fetchData(pagination.current, pagination.pageSize, search)} />
-          {canCreate && FormComponent && (
+          {canImportResource && <Button icon={<UploadOutlined />} onClick={handleImportClick}>CSV Import</Button>}
+          {canExportResource && <Button icon={<ExportOutlined />} onClick={handleExport} title={exportHelp?.help_text_az}>CSV Export</Button>}
+          {canReadResource && <Button icon={<ReloadOutlined />} onClick={() => fetchData(pagination.current, pagination.pageSize, search)} />}
+          {canCreateResource && FormComponent && (
             <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
               Yeni
             </Button>
@@ -281,7 +306,7 @@ export default function CrudPage<T extends { id: string }>({
 
       <Card>
         <Table<T>
-          columns={[...columns, ...actionColumn]}
+          columns={showActionColumn ? [...columns, ...actionColumn] : columns}
           dataSource={data}
           rowKey="id"
           loading={loading}

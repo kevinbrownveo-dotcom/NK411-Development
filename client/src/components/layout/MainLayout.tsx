@@ -28,21 +28,21 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
-  const { isAdmin } = usePermission();
+  const { isAdmin, canRead } = usePermission();
   const { token: themeToken } = theme.useToken();
 
   const baseMenuItems = [
-    { key: '/', icon: <DashboardOutlined />, label: 'Dashboard' },
-    { key: '/assets', icon: <LaptopOutlined />, label: 'Aktivlər' },
-    { key: '/assets-map', icon: <NodeIndexOutlined />, label: 'Aktiv Xəritəsi (D3)' },
-    { key: '/threats', icon: <AlertOutlined />, label: 'Təhdidlər' },
-    { key: '/vulnerabilities', icon: <BugOutlined />, label: 'Boşluqlar' },
-    { key: '/risks', icon: <ExclamationCircleOutlined />, label: 'Risqlər' },
-    { key: '/incidents', icon: <SafetyOutlined />, label: 'İnsidentlər' },
-    { key: '/solutions', icon: <ToolOutlined />, label: 'Həllər' },
-    { key: '/requirements', icon: <FileProtectOutlined />, label: 'Tələblər və Hədlər' },
-    { key: '/reconciliations', icon: <SwapOutlined />, label: 'Uzlaşdırma' },
-    { key: '/audit', icon: <AuditOutlined />, label: 'Audit Jurnalı' },
+    { key: '/', icon: <DashboardOutlined />, label: 'Dashboard', resource: 'dashboard' },
+    { key: '/assets', icon: <LaptopOutlined />, label: 'Aktivlər', resource: 'assets' },
+    { key: '/assets-map', icon: <NodeIndexOutlined />, label: 'Aktiv Xəritəsi (D3)', resource: 'assets' },
+    { key: '/threats', icon: <AlertOutlined />, label: 'Təhdidlər', resource: 'threats' },
+    { key: '/vulnerabilities', icon: <BugOutlined />, label: 'Boşluqlar', resource: 'vulnerabilities' },
+    { key: '/risks', icon: <ExclamationCircleOutlined />, label: 'Risklər', resource: 'risks' },
+    { key: '/incidents', icon: <SafetyOutlined />, label: 'İnsidentlər', resource: 'incidents' },
+    { key: '/solutions', icon: <ToolOutlined />, label: 'Həllər', resource: 'solutions' },
+    { key: '/requirements', icon: <FileProtectOutlined />, label: 'Tələblər və Hədlər', resource: 'requirements' },
+    { key: '/reconciliations', icon: <SwapOutlined />, label: 'Uzlaşdırma', resource: 'reconciliations' },
+    { key: '/audit', icon: <AuditOutlined />, label: 'Audit Jurnalı', resource: 'audit' },
   ];
 
   const adminMenuItems = isAdmin() ? [
@@ -59,7 +59,12 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     },
   ] : [];
 
-  const menuItems = [...baseMenuItems, ...adminMenuItems];
+  const menuItems = [
+    ...baseMenuItems
+      .filter((item) => canRead(item.resource))
+      .map(({ resource: _resource, ...item }) => item),
+    ...adminMenuItems,
+  ];
 
   const userMenuItems = [
     {

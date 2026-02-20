@@ -26,5 +26,5 @@ const columns = [
 ];
 
 export default function VulnerabilitiesPage() {
-  return <CrudPage<Vulnerability> title="Boşluq / Uyğunsuzluq Reyestri" apiPath="/vulnerabilities" columns={columns} formComponent={VulnerabilityForm} />;
+  return <CrudPage<Vulnerability> title="Boşluq / Uyğunsuzluq Reyestri" apiPath="/vulnerabilities" columns={columns} formComponent={VulnerabilityForm} permissionResource="vulnerabilities" />;
 }

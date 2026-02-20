@@ -3,6 +3,7 @@ import { Tag } from 'antd';
 import CrudPage from '../../components/common/CrudPage';
 import { Incident } from '../../types';
 import FieldLabelWithHelp from '../../components/common/FieldLabelWithHelp';
+import IncidentForm from './IncidentForm';
 
 const SEVERITY_COLORS: Record<string, string> = {
   P1_kritik: 'red', P2_yüksək: 'orange', P3_orta: 'gold', P4_aşağı: 'green',
@@ -28,5 +29,5 @@ const columns = [
 ];
 
 export default function IncidentsPage() {
-  return <CrudPage<Incident> title="İnsident İdarəetməsi" apiPath="/incidents" columns={columns} />;
+  return <CrudPage<Incident> title="İnsident İdarəetməsi" apiPath="/incidents" columns={columns} formComponent={IncidentForm} permissionResource="incidents" />;
 }

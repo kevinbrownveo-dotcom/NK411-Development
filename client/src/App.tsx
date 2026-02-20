@@ -21,8 +21,9 @@ import RolesPage from './pages/admin/RolesPage';
 import LdapMappingPage from './pages/admin/LdapMappingPage';
 import { usePermission } from './hooks/usePermission';
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
+function ProtectedRoute({ children, resource }: { children: React.ReactNode; resource?: string }) {
   const { isAuthenticated, loading } = useAuth();
+  const { canRead } = usePermission();
 
   if (loading) {
     return <Spin size="large" style={{ display: 'block', margin: '200px auto' }} />;
@@ -30,6 +31,10 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (resource && !canRead(resource)) {
+    return <Navigate to="/" replace />;
   }
 
   return <MainLayout>{children}</MainLayout>;
@@ -58,17 +63,17 @@ export default function App() {
       <Route path="/login" element={
         isAuthenticated ? <Navigate to="/" replace /> : <LoginPage />
       } />
-      <Route path="/" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-      <Route path="/assets" element={<ProtectedRoute><AssetsPage /></ProtectedRoute>} />
-      <Route path="/assets-map" element={<ProtectedRoute><AssetDependencyMapPage /></ProtectedRoute>} />
-      <Route path="/threats" element={<ProtectedRoute><ThreatsPage /></ProtectedRoute>} />
-      <Route path="/vulnerabilities" element={<ProtectedRoute><VulnerabilitiesPage /></ProtectedRoute>} />
-      <Route path="/risks" element={<ProtectedRoute><RisksPage /></ProtectedRoute>} />
-      <Route path="/incidents" element={<ProtectedRoute><IncidentsPage /></ProtectedRoute>} />
-      <Route path="/solutions" element={<ProtectedRoute><SolutionsPage /></ProtectedRoute>} />
-      <Route path="/requirements" element={<ProtectedRoute><RequirementsPage /></ProtectedRoute>} />
-      <Route path="/reconciliations" element={<ProtectedRoute><ReconciliationsPage /></ProtectedRoute>} />
-      <Route path="/audit" element={<ProtectedRoute><AuditLogPage /></ProtectedRoute>} />
+      <Route path="/" element={<ProtectedRoute resource="dashboard"><DashboardPage /></ProtectedRoute>} />
+      <Route path="/assets" element={<ProtectedRoute resource="assets"><AssetsPage /></ProtectedRoute>} />
+      <Route path="/assets-map" element={<ProtectedRoute resource="assets"><AssetDependencyMapPage /></ProtectedRoute>} />
+      <Route path="/threats" element={<ProtectedRoute resource="threats"><ThreatsPage /></ProtectedRoute>} />
+      <Route path="/vulnerabilities" element={<ProtectedRoute resource="vulnerabilities"><VulnerabilitiesPage /></ProtectedRoute>} />
+      <Route path="/risks" element={<ProtectedRoute resource="risks"><RisksPage /></ProtectedRoute>} />
+      <Route path="/incidents" element={<ProtectedRoute resource="incidents"><IncidentsPage /></ProtectedRoute>} />
+      <Route path="/solutions" element={<ProtectedRoute resource="solutions"><SolutionsPage /></ProtectedRoute>} />
+      <Route path="/requirements" element={<ProtectedRoute resource="requirements"><RequirementsPage /></ProtectedRoute>} />
+      <Route path="/reconciliations" element={<ProtectedRoute resource="reconciliations"><ReconciliationsPage /></ProtectedRoute>} />
+      <Route path="/audit" element={<ProtectedRoute resource="audit"><AuditLogPage /></ProtectedRoute>} />
       <Route path="/legal/risk-register" element={<LegalRiskRegisterRedirect />} />
       <Route path="/admin/users" element={<AdminRoute><UsersPage /></AdminRoute>} />
       <Route path="/admin/roles" element={<AdminRoute><RolesPage /></AdminRoute>} />

@@ -3,6 +3,7 @@ import { Tag } from 'antd';
 import CrudPage from '../../components/common/CrudPage';
 import { Risk } from '../../types';
 import FieldLabelWithHelp from '../../components/common/FieldLabelWithHelp';
+import RiskForm from './RiskForm';
 
 const PRIORITY_COLORS: Record<string, string> = {
   kritik: 'red', yüksək: 'orange', orta: 'gold', aşağı: 'green',
@@ -26,5 +27,5 @@ const columns = [
 ];
 
 export default function RisksPage() {
-  return <CrudPage<Risk> title="Risk Reyestri" apiPath="/risks" columns={columns} />;
+  return <CrudPage<Risk> title="Risk Reyestri" apiPath="/risks" columns={columns} formComponent={RiskForm} permissionResource="risks" />;
 }
