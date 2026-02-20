@@ -806,8 +806,9 @@ _______________________</pre>
 const params = new URLSearchParams(window.location.search);
 const page = params.get("page");
 const findParam = params.get("find") || "";
+const findCandidates = findParam.split("||").map((t)=>t.trim()).filter(Boolean);
 const input = document.getElementById("find");
-input.value = findParam;
+input.value = findCandidates[0] || findParam;
 function clearHighlights(){ document.querySelectorAll("mark").forEach((m)=>{ const t=document.createTextNode(m.textContent); m.replaceWith(t);}); }
 function escapeRegExp(value){ return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
 function normalizeWithMap(text){
@@ -889,8 +890,26 @@ function highlightAndScroll(term){
   }
   return false;
 }
+function highlightAndScrollCandidates(candidates){
+  for (const candidate of candidates) {
+    if (highlightAndScroll(candidate)) {
+      input.value = candidate;
+      return true;
+    }
+  }
+  return false;
+}
 function goPage(){ if(!page) return false; const target=document.getElementById(`page-${page}`); if(target){ target.scrollIntoView({behavior:"smooth", block:"start"}); return true;} return false; }
-input.addEventListener("keydown", (e)=>{ if(e.key==="Enter"){ highlightAndScroll(input.value.trim()); }});
-setTimeout(()=>{ const found = findParam ? highlightAndScroll(findParam) : false; if(!found) goPage(); }, 120);
+input.addEventListener("keydown", (e)=>{
+  if(e.key==="Enter"){
+    const entered = input.value.trim();
+    const candidates = entered.includes("||") ? entered.split("||").map((t)=>t.trim()).filter(Boolean) : [entered];
+    highlightAndScrollCandidates(candidates);
+  }
+});
+setTimeout(()=>{
+  const found = findCandidates.length > 0 ? highlightAndScrollCandidates(findCandidates) : false;
+  if(!found) goPage();
+}, 120);
 </script>
 </body></html>

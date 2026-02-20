@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "validate:help": "node scripts/validate-help.mjs",
+    "build": "npm run validate:help && tsc && vite build",
     "preview": "vite preview"
   },
   "dependencies": {

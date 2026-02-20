@@ -1,7 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Button, Drawer, Space, Tag, Tooltip, Typography, theme } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { getFieldHelp } from '../../help/registry';
+import { extractClauseIds, getClauseTexts } from '../../help/legalClauseText';
 
 interface FieldLabelWithHelpProps {
   fieldKey: string;
@@ -11,12 +12,25 @@ interface FieldLabelWithHelpProps {
 
 export default function FieldLabelWithHelp({ fieldKey, label, required = false }: FieldLabelWithHelpProps) {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [clauseTexts, setClauseTexts] = useState<Record<string, string | null>>({});
   const help = useMemo(() => getFieldHelp(fieldKey), [fieldKey]);
   const { token } = theme.useToken();
+  const clauseIds = useMemo(() => (help ? extractClauseIds(help.legal_ref) : []), [help]);
+
+  useEffect(() => {
+    if (!drawerOpen || !help || clauseIds.length === 0) {
+      return;
+    }
+
+    getClauseTexts(clauseIds)
+      .then((result) => setClauseTexts(result))
+      .catch(() => setClauseTexts({}));
+  }, [drawerOpen, help, clauseIds]);
 
   const openLegalDoc = () => {
     if (!help) return;
-    const url = `/legal/risk-register?page=${help.pdf_page}&find=${encodeURIComponent(help.pdf_anchor)}`;
+    const terms = help.search_terms_az?.length ? help.search_terms_az : [help.pdf_anchor];
+    const url = `/legal/risk-register?page=${help.pdf_page}&find=${encodeURIComponent(terms.join('||'))}`;
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
@@ -42,6 +56,8 @@ export default function FieldLabelWithHelp({ fieldKey, label, required = false }
     </Space>
   );
 
+  const drawerTitle = `${help.ui_label_az && !help.ui_label_az.includes('_') ? help.ui_label_az : label} — Kömək`;
+
   return (
     <>
       <Space size={6}>
@@ -57,7 +73,7 @@ export default function FieldLabelWithHelp({ fieldKey, label, required = false }
       </Space>
 
       <Drawer
-        title={`${help.ui_label_az} — Kömək`}
+        title={drawerTitle}
         placement="right"
         width={420}
         open={drawerOpen}
@@ -67,8 +83,28 @@ export default function FieldLabelWithHelp({ fieldKey, label, required = false }
         <Typography.Paragraph style={{ color: token.colorText }}><strong>Qanun istinadı:</strong> {help.legal_ref}</Typography.Paragraph>
         <Typography.Text strong style={{ color: token.colorText }}>Maddə və cümlələr:</Typography.Text>
         <Typography.Paragraph style={{ color: token.colorText, whiteSpace: 'pre-line', marginTop: 8 }}>
-          {help.legal_excerpt_az || `${help.legal_ref}. Axtarış ifadəsi: ${help.pdf_anchor}`}
+          {help.legal_excerpt_az || `${help.legal_ref}. Axtarış ifadələri: ${(help.search_terms_az || [help.pdf_anchor]).join(', ')}`}
         </Typography.Paragraph>
+        {clauseIds.length > 0 && (
+          <>
+            <Typography.Text strong style={{ color: token.colorText }}>Maddə mətni (sənəddən):</Typography.Text>
+            <div style={{ marginTop: 8 }}>
+              <Space direction="vertical" size={10} style={{ width: '100%' }}>
+                {clauseIds.map((clauseId) => {
+                  const text = clauseTexts[clauseId];
+                  return (
+                    <div key={clauseId}>
+                      <Typography.Text strong style={{ color: token.colorText }}>{`${clauseId}.`}</Typography.Text>
+                      <Typography.Paragraph style={{ color: token.colorText, margin: '4px 0 0' }}>
+                        {text || 'Bu maddə üçün mətni sənəddən avtomatik çıxarmaq mümkün olmadı.'}
+                      </Typography.Paragraph>
+                    </div>
+                  );
+                })}
+              </Space>
+            </div>
+          </>
+        )}
         {help.example_az && (
           <Typography.Paragraph style={{ color: token.colorText }}><strong>Nümunə:</strong> {help.example_az}</Typography.Paragraph>
         )}

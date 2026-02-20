@@ -1,0 +1,394 @@
+{
+  "assets.name": {
+    "ui_label_az": "Aktivin adı",
+    "help_text_az": "Mühafizə olunan və ya dəstəkləyici aktivin tanınması üçün unikal, aydın ad daxil edin.",
+    "allowed_values": null,
+    "legal_ref": "§4.2.2.1, §5.2.2",
+    "pdf_page": 6,
+    "pdf_anchor": "4.2.2.1",
+    "search_terms_az": ["4.2.2.1", "mühafizə olunan", "aktivlərin müəyyən olunması"],
+    "legal_excerpt_az": "§4.2.2.1 üzrə ilkin və dəstəkləyici aktivlər müəyyən olunmalı, §5.2.2 üzrə kataloq/reyestr məlumatları risklər reyestri ilə inteqrasiya olunmalıdır.",
+    "example_az": "Müştəri məlumat bazası serveri"
+  },
+  "assets.category": {
+    "ui_label_az": "Aktiv kateqoriyası",
+    "help_text_az": "Aktivi əsas və ya dəstəkləyici kateqoriya üzrə təsnif edin.",
+    "allowed_values": ["əsas", "dəstəkləyici"],
+    "legal_ref": "§4.2.2.1",
+    "pdf_page": 6,
+    "pdf_anchor": "4.2.2.1",
+    "search_terms_az": ["4.2.2.1", "ilkin və dəstəkləyici kateqoriyalı aktivlər"],
+    "legal_excerpt_az": "§4.2.2.1 aktivlərin ilkin (əsas) və dəstəkləyici kateqoriyalar üzrə müəyyən olunmasını tələb edir.",
+    "example_az": "əsas"
+  },
+  "assets.sub_category": {
+    "ui_label_az": "Aktivin alt kateqoriyası",
+    "help_text_az": "Aktivin növünü daha dəqiq təsvir edən alt kateqoriyanı seçin.",
+    "allowed_values": ["informasiya", "hardware", "software", "şəbəkə", "insan", "fiziki"],
+    "legal_ref": "§5.2.2, §5.4",
+    "pdf_page": 8,
+    "pdf_anchor": "5.2.2",
+    "search_terms_az": ["5.2.2", "5.4", "kataloq", "aktivlər barədə"],
+    "legal_excerpt_az": "§5.2.2 və §5.4 aktivlərə dair kataloq/reyestr məlumatlarının strukturlaşdırılmış şəkildə toplanmasını nəzərdə tutur.",
+    "example_az": "software"
+  },
+  "assets.value": {
+    "ui_label_az": "Aktivin dəyəri",
+    "help_text_az": "Aktivin risk hesablamasında istifadə olunan dəyərini (şkalaya uyğun) daxil edin.",
+    "allowed_values": ["1", "2", "3", "4", "5"],
+    "legal_ref": "§4.2.3.3, §4.2.3.4, §4.2.3.5",
+    "pdf_page": 6,
+    "pdf_anchor": "4.2.3.3",
+    "search_terms_az": ["4.2.3.3", "aktivin dəyəri", "4.2.3.4", "4.2.3.5"],
+    "legal_excerpt_az": "§4.2.3.3 və davamında riskin ölçülməsi aktivin dəyəri və ehtimal/təsir faktorları əsasında aparılır.",
+    "example_az": "5"
+  },
+  "assets.criticality": {
+    "ui_label_az": "Aktivin kritiklik dərəcəsi",
+    "help_text_az": "Aktiv komprometasiya olunduqda təsirin ağırlıq dərəcəsini seçin.",
+    "allowed_values": ["çox_aşağı", "aşağı", "orta", "yüksək", "kritik"],
+    "legal_ref": "§4.2.3.1, §4.2.3.2",
+    "pdf_page": 6,
+    "pdf_anchor": "4.2.3.1",
+    "search_terms_az": ["4.2.3.1", "kritiklik ölçüsü", "4.2.3.2"],
+    "legal_excerpt_az": "§4.2.3.1–§4.2.3.2 riskə təsir edən təhdid, zəiflik və texniki/biznes təsir ölçülərinin qiymətləndirilməsini tələb edir.",
+    "example_az": "yüksək"
+  },
+  "assets.location": {
+    "ui_label_az": "Aktivin yerləşməsi",
+    "help_text_az": "Aktivin fiziki və ya məntiqi yerləşmə mühitini qeyd edin.",
+    "allowed_values": null,
+    "legal_ref": "§5.2.2, §5.4",
+    "pdf_page": 8,
+    "pdf_anchor": "5.2.2",
+    "search_terms_az": ["5.2.2", "5.4", "aktivlər barədə"],
+    "legal_excerpt_az": "§5.2.2 və §5.4 aktivlərə dair katalog məlumatlarının risklər reyestri ilə ortaq şəkildə aparılmasını tələb edir.",
+    "example_az": "Data mərkəzi – Bakı"
+  },
+  "assets.last_review": {
+    "ui_label_az": "Son baxış tarixi",
+    "help_text_az": "Aktivin son qiymətləndirmə/baxış tarixini qeyd edin.",
+    "allowed_values": null,
+    "legal_ref": "§6.1, §6.8",
+    "pdf_page": 9,
+    "pdf_anchor": "6.1",
+    "search_terms_az": ["6.1", "Risklər reyestrinin aparılması", "6.8"],
+    "legal_excerpt_az": "§6 bölməsi risklər reyestrinin mütəmadi aparılması və funksional idarəetmənin davamlı icrasını nəzərdə tutur.",
+    "example_az": "2026-02-20"
+  },
+
+  "threats.category": {
+    "ui_label_az": "Təhdid kateqoriyası",
+    "help_text_az": "Təhdidi mənbə və xarakterinə uyğun kateqoriyaya aid edin.",
+    "allowed_values": ["texniki", "fiziki", "insani", "prosessual", "xarici"],
+    "legal_ref": "§4.2.2.2, §5.5.2",
+    "pdf_page": 6,
+    "pdf_anchor": "4.2.2.2",
+    "search_terms_az": ["4.2.2.2", "5.5.2", "təhdidlərin kateqoriyalar üzrə"],
+    "legal_excerpt_az": "§4.2.2.2 təhdidlərin müəyyən olunmasını, §5.5.2 isə kateqoriyalar üzrə təsnifatlaşdırılmış təhdid toplusunu tələb edir.",
+    "example_az": "texniki"
+  },
+  "threats.source": {
+    "ui_label_az": "Təhdid mənbəyi",
+    "help_text_az": "Təhdidin daxili, xarici və ya hibrid mənbədən yaranmasını qeyd edin.",
+    "allowed_values": ["kənardan", "daxildən", "hər_ikisi"],
+    "legal_ref": "§4.2.2.2",
+    "pdf_page": 6,
+    "pdf_anchor": "4.2.2.2",
+    "search_terms_az": ["4.2.2.2", "informasiya təhlükəsizliyinə əvvəlcədən məlum", "təhdidlər"],
+    "legal_excerpt_az": "§4.2.2.2 əvvəlcədən məlum və sonradan yaranan təhdidlərin müəyyən olunmasını nəzərdə tutur.",
+    "example_az": "kənardan"
+  },
+  "threats.purpose": {
+    "ui_label_az": "Təhdidin məqsədi",
+    "help_text_az": "Təhdid reallaşdıqda gözlənilən niyyət/məqsədi bir və ya bir neçə seçimlə göstərin.",
+    "allowed_values": null,
+    "legal_ref": "§4.2.2.2, §2.1.2",
+    "pdf_page": 3,
+    "pdf_anchor": "2.1.2",
+    "search_terms_az": ["2.1.2", "təhdid", "4.2.2.2"],
+    "legal_excerpt_az": "§2.1.2 təhdid anlayışını, §4.2.2.2 isə təhdidlərin müəyyənləşdirilməsi prosesini müəyyən edir.",
+    "example_az": "məlumat sızdırılması"
+  },
+  "threats.target_type": {
+    "ui_label_az": "Hədəf tipi",
+    "help_text_az": "Təhdidin yönəldiyi obyekt tipini seçin.",
+    "allowed_values": ["struktur", "infrastruktur_komponenti", "konfiqurasiya", "proses", "subyekt"],
+    "legal_ref": "§4.2.2.2, §5.6.3",
+    "pdf_page": 8,
+    "pdf_anchor": "5.6.3",
+    "search_terms_az": ["5.6.3", "təhdidlərin", "obyektləri"],
+    "legal_excerpt_az": "§5.6.3 təhdid/həll vektorları olan obyektlərin və əlaqəli rekvizitlərin müəyyən olunmasını nəzərdə tutur.",
+    "example_az": "infrastruktur_komponenti"
+  },
+  "threats.intentionality": {
+    "ui_label_az": "Məqsədyönlülük",
+    "help_text_az": "Təhdidin qərəzli, təsadüfi və ya axın üzrə yaranmasını qeyd edin.",
+    "allowed_values": ["qərəzli", "təsadüfi", "axın_üzrə"],
+    "legal_ref": "§4.2.2.2, §2.1.2",
+    "pdf_page": 3,
+    "pdf_anchor": "2.1.2",
+    "search_terms_az": ["2.1.2", "4.2.2.2", "təhdid"],
+    "legal_excerpt_az": "Təhdid anlayışının tərkibində niyyət və təsiretmə konteksti §2.1.2 və §4.2.2.2 ilə əlaqələndirilir.",
+    "example_az": "qərəzli"
+  },
+  "threats.severity": {
+    "ui_label_az": "Təhdidin ciddiliyi",
+    "help_text_az": "Təhdidin potensial təsir dərəcəsini seçin.",
+    "allowed_values": ["çox_aşağı", "aşağı", "orta", "yüksək", "kritik"],
+    "legal_ref": "§4.2.3.1, §4.2.3.2",
+    "pdf_page": 6,
+    "pdf_anchor": "4.2.3.1",
+    "search_terms_az": ["4.2.3.1", "təsiretmə ölçüsü", "4.2.3.2"],
+    "legal_excerpt_az": "§4.2.3.1–§4.2.3.2 riskin təsiretmə ölçüsünün və texniki/biznes təsirinin qiymətləndirilməsini tələb edir.",
+    "example_az": "yüksək"
+  },
+  "threats.probability_band_law": {
+    "ui_label_az": "Ehtimal diapazonu",
+    "help_text_az": "Təhdidin başvermə ehtimalı üçün diapazon seçin.",
+    "allowed_values": ["p01_20", "p21_40", "p41_60", "p61_80", "p81_100"],
+    "legal_ref": "§4.2.3.1",
+    "pdf_page": 6,
+    "pdf_anchor": "4.2.3.1",
+    "search_terms_az": ["4.2.3.1", "başvermə ehtimalı"],
+    "legal_excerpt_az": "§4.2.3.1 risk ölçülməsində başvermə ehtimalı və statistik məlumatlardan istifadənin müəyyən olunmasını tələb edir.",
+    "example_az": "p41_60"
+  },
+  "threats.realization_tech": {
+    "ui_label_az": "Reallaşma texnikası",
+    "help_text_az": "Təhdidin necə həyata keçirilə biləcəyini qısa təsvir edin.",
+    "allowed_values": null,
+    "legal_ref": "§4.2.2.2, §5.6.3",
+    "pdf_page": 8,
+    "pdf_anchor": "5.6.3",
+    "search_terms_az": ["5.6.3", "təhdidlərin", "vektorları"],
+    "legal_excerpt_az": "§5.6.3 təhdid vektorlarının və obyekt əlaqələrinin qeydini tələb edir; bu sahə həmin mexanizmi sənədləşdirir.",
+    "example_az": "Phishing kampaniyası + credential harvesting"
+  },
+  "threats.is_external": {
+    "ui_label_az": "DXƏIT mənbəli",
+    "help_text_az": "Təhdid qeydi DXƏIT və ya xarici mənbədən daxil olubsa işarələyin.",
+    "allowed_values": ["true", "false"],
+    "legal_ref": "§7.1.3, §7.1.4",
+    "pdf_page": 10,
+    "pdf_anchor": "7.1.3",
+    "search_terms_az": ["7.1.3", "Təhdidlər və həllər kataloqu", "7.1.4"],
+    "legal_excerpt_az": "§7.1.3–§7.1.4 üzrə Təhdidlər və həllər kataloqundan məlumatların qəbul və ötürülməsi təmin edilməlidir.",
+    "example_az": "true"
+  },
+
+  "vulnerabilities.type": {
+    "ui_label_az": "Boşluq növü",
+    "help_text_az": "Boşluğun xarakterini (uyğunsuzluq, zəiflik və s.) seçin.",
+    "allowed_values": ["boşluq", "nəzarətsizlik", "zəiflik", "uyğunsuzluq"],
+    "legal_ref": "§4.2.2.4",
+    "pdf_page": 6,
+    "pdf_anchor": "4.2.2.4",
+    "search_terms_az": ["4.2.2.4", "boşluqların", "çatışmazlıqların"],
+    "legal_excerpt_az": "§4.2.2.4 təhdidlərin aktivlərdə istifadə edə biləcəyi boşluq və çatışmazlıqların müəyyən olunmasını tələb edir.",
+    "example_az": "uyğunsuzluq"
+  },
+  "vulnerabilities.asset_id": {
+    "ui_label_az": "Əlaqəli aktiv",
+    "help_text_az": "Boşluğun aid olduğu aktiv qeydi ilə əlaqə qurun.",
+    "allowed_values": null,
+    "legal_ref": "§4.2.2.4, §5.4",
+    "pdf_page": 8,
+    "pdf_anchor": "5.4",
+    "search_terms_az": ["5.4", "aktivlər barədə", "4.2.2.4"],
+    "legal_excerpt_az": "Boşluqların aktiv kontekstində izlənməsi §4.2.2.4 və aktiv məlumat bazaları ilə inteqrasiya §5.4 ilə uyğunlaşdırılır.",
+    "example_az": "AST-2026-0042"
+  },
+  "vulnerabilities.severity_internal": {
+    "ui_label_az": "Daxili ciddilik",
+    "help_text_az": "Boşluğun təşkilatdaxili təsir ciddiliyini qiymətləndirin.",
+    "allowed_values": ["az", "orta", "yüksək", "çox_yüksək", "kritik", "fövqəladə"],
+    "legal_ref": "§4.2.3.1, §4.2.3.2",
+    "pdf_page": 6,
+    "pdf_anchor": "4.2.3.2",
+    "search_terms_az": ["4.2.3.2", "texniki", "biznes"],
+    "legal_excerpt_az": "§4.2.3.2 riskin texniki və biznes təsirinin qiymətləndirilməsi yanaşmasını müəyyən edir.",
+    "example_az": "kritik"
+  },
+  "vulnerabilities.detection_method": {
+    "ui_label_az": "Aşkarlanma üsulu",
+    "help_text_az": "Boşluğun hansı üsulla müəyyənləşdirildiyini qeyd edin.",
+    "allowed_values": ["audit", "pentest", "özqiymətləndirmə", "dxeit_bildirişi", "insident"],
+    "legal_ref": "§4.2.2.4, §4.2.2.5",
+    "pdf_page": 6,
+    "pdf_anchor": "4.2.2.5",
+    "search_terms_az": ["4.2.2.5", "insidentlərin aşkarlanması", "4.2.2.4"],
+    "legal_excerpt_az": "§4.2.2.4 boşluqların müəyyən olunmasını, §4.2.2.5 isə hadisə/insident aşkarlanması ilə əlaqələndirilməsini tələb edir.",
+    "example_az": "pentest"
+  },
+  "vulnerabilities.exploitation_status": {
+    "ui_label_az": "İstismar statusu",
+    "help_text_az": "Boşluğun real hücumda istifadə olunma vəziyyətini göstərin.",
+    "allowed_values": ["istifadə_olunmayıb", "istifadə_cəhdi", "istifadə_edilib"],
+    "legal_ref": "§4.2.2.5, §4.3.4",
+    "pdf_page": 7,
+    "pdf_anchor": "4.3.4",
+    "search_terms_az": ["4.3.4", "insidentlərə cavab", "4.2.2.5"],
+    "legal_excerpt_az": "Boşluğun istismar vəziyyəti risk reallaşması və insident cavab tədbirləri ilə §4.3.4 üzrə əlaqələndirilir.",
+    "example_az": "istifadə_cəhdi"
+  },
+  "vulnerabilities.status": {
+    "ui_label_az": "Boşluq statusu",
+    "help_text_az": "Boşluğun cari emal mərhələsini seçin.",
+    "allowed_values": ["açıq", "işdə", "həll_edilib", "risk_kimi_qəbul_edilib"],
+    "legal_ref": "§4.3.1, §4.3.2",
+    "pdf_page": 7,
+    "pdf_anchor": "4.3.1",
+    "search_terms_az": ["4.3.1", "riskin qarşısının alınması", "4.3.2"],
+    "legal_excerpt_az": "§4.3.1 və §4.3.2 risk emalı variantı və emal üsulunun müəyyən olunmasına əsas yaradır.",
+    "example_az": "işdə"
+  },
+
+  "risks.name": {
+    "ui_label_az": "Riskin adı",
+    "help_text_az": "Qiymətləndirilən riskin qısa və dəqiq adını daxil edin.",
+    "allowed_values": null,
+    "legal_ref": "§2.1.1, §4.2.1",
+    "pdf_page": 3,
+    "pdf_anchor": "2.1.1",
+    "search_terms_az": ["2.1.1", "risk", "4.2.1"],
+    "legal_excerpt_az": "§2.1.1 risk anlayışını, §4.2.1 isə risk analizinin proses çərçivəsini müəyyən edir.",
+    "example_az": "Mərkəzi DB serverində məlumat sızması riski"
+  },
+  "risks.qualitative_score": {
+    "ui_label_az": "Keyfiyyət skoru",
+    "help_text_az": "Risk dərəcəsi üçün keyfiyyət əsaslı hesablanan göstəricidir.",
+    "allowed_values": null,
+    "legal_ref": "§4.2.3.4",
+    "pdf_page": 6,
+    "pdf_anchor": "4.2.3.4",
+    "search_terms_az": ["4.2.3.4", "Risk dərəcəsi"],
+    "legal_excerpt_az": "§4.2.3.4 keyfiyyət əsaslı risk qiymətləndirilməsi formulasını müəyyən edir.",
+    "example_az": "12"
+  },
+  "risks.treatment_option": {
+    "ui_label_az": "Risk emal variantı",
+    "help_text_az": "Risk üçün seçilən emal variantını müəyyən edin.",
+    "allowed_values": ["qarşısını_al", "azalt", "başqa_tərəfə_ötür", "qəbul_et"],
+    "legal_ref": "§4.3.1",
+    "pdf_page": 7,
+    "pdf_anchor": "4.3.1",
+    "search_terms_az": ["4.3.1", "riskin qarşısının alınması", "riski qəbul"],
+    "legal_excerpt_az": "§4.3.1 risk emal variantlarının (qarşısının alınması, azaltma, ötürmə, qəbuletmə) müəyyən olunmasını tələb edir.",
+    "example_az": "azalt"
+  },
+  "risks.residual_risk_score": {
+    "ui_label_az": "Qalıq risk",
+    "help_text_az": "Emal tədbirlərindən sonra qalan risk səviyyəsini ifadə edir.",
+    "allowed_values": null,
+    "legal_ref": "§2.1.18, §4.2.4",
+    "pdf_page": 3,
+    "pdf_anchor": "2.1.18",
+    "search_terms_az": ["2.1.18", "qalıq risk", "4.2.4"],
+    "legal_excerpt_az": "§2.1.18 qalıq risk anlayışını verir; §4.2.4 isə analiz nəticələrinə əsasən dəyərləndirməni tələb edir.",
+    "example_az": "6"
+  },
+
+  "incidents.type": {
+    "ui_label_az": "İnsident növü",
+    "help_text_az": "İnsidentin xarakterini standart kateqoriyalar üzrə seçin.",
+    "allowed_values": null,
+    "legal_ref": "§2.1.3, §4.2.2.5",
+    "pdf_page": 3,
+    "pdf_anchor": "2.1.3",
+    "search_terms_az": ["2.1.3", "insident", "4.2.2.5"],
+    "legal_excerpt_az": "§2.1.3 insident anlayışını, §4.2.2.5 isə hadisə/insidentlərin müəyyən olunması və aşkarlanmasını müəyyən edir.",
+    "example_az": "məlumat_sızması"
+  },
+  "incidents.severity": {
+    "ui_label_az": "İnsident ciddiliyi",
+    "help_text_az": "İnsidentin təsir dərəcəsinə uyğun prioritet səviyyəsini qeyd edin.",
+    "allowed_values": ["P1_kritik", "P2_yüksək", "P3_orta", "P4_aşağı"],
+    "legal_ref": "§4.2.3.1, §4.2.3.2",
+    "pdf_page": 6,
+    "pdf_anchor": "4.2.3.2",
+    "search_terms_az": ["4.2.3.2", "təsir"],
+    "legal_excerpt_az": "İnsident ciddilik səviyyəsi risk təsirinin texniki və biznes qiymətləndirilməsi yanaşmasına uyğunlaşdırılır.",
+    "example_az": "P2_yüksək"
+  },
+  "incidents.detection_datetime": {
+    "ui_label_az": "Aşkarlanma vaxtı",
+    "help_text_az": "İnsidentin ilk aşkarlanma tarix/saatını daxil edin.",
+    "allowed_values": null,
+    "legal_ref": "§4.2.2.5, §4.3.4",
+    "pdf_page": 7,
+    "pdf_anchor": "4.2.2.5",
+    "search_terms_az": ["4.2.2.5", "insidentlərin aşkarlanması", "4.3.4"],
+    "legal_excerpt_az": "§4.2.2.5 insidentlərin aşkarlanmasını, §4.3.4 isə reallaşmış risklərə cavab tədbirlərinin müəyyən olunmasını tələb edir.",
+    "example_az": "2026-02-20T11:35:00"
+  },
+  "incidents.notify_dxeit": {
+    "ui_label_az": "DXƏIT bildirişi",
+    "help_text_az": "İnsidentin DXƏIT-ə bildirilməsi tələb olunursa işarələyin.",
+    "allowed_values": ["true", "false"],
+    "legal_ref": "§6.1.5, §7.1.3",
+    "pdf_page": 17,
+    "pdf_anchor": "6.1.5",
+    "search_terms_az": ["6.1.5", "bildiriş", "7.1.3"],
+    "legal_excerpt_az": "§6.1.5 insident cavabında bildiriş mərhələsini, §7.1.3 isə müvafiq kataloq məlumatlarının mübadiləsini nəzərdə tutur.",
+    "example_az": "true"
+  },
+
+  "solutions.type": {
+    "ui_label_az": "Həll növü",
+    "help_text_az": "Risk emalında tətbiq olunan həll növünü seçin.",
+    "allowed_values": ["qabaqlayıcı", "nəzarətedici", "təshihedici", "bərpaedici"],
+    "legal_ref": "§5.5.3, §6.2.1",
+    "pdf_page": 8,
+    "pdf_anchor": "5.5.3",
+    "search_terms_az": ["5.5.3", "həllərin mərkəzləşmiş uçotu", "6.2.1"],
+    "legal_excerpt_az": "§5.5.3 risk emalı və insident cavabı üzrə həllərin mərkəzləşmiş uçotunu tələb edir; §6.2.1 emal üsullarının tətbiqini dəstəkləyir.",
+    "example_az": "nəzarətedici"
+  },
+  "solutions.source": {
+    "ui_label_az": "Həll mənbəyi",
+    "help_text_az": "Həllin hansı mənbədən daxil edildiyini göstərin.",
+    "allowed_values": ["dxeit_kataloqu", "daxili", "vendor"],
+    "legal_ref": "§7.1.3, §7.1.4",
+    "pdf_page": 10,
+    "pdf_anchor": "7.1.3",
+    "search_terms_az": ["7.1.3", "Təhdidlər və həllər kataloqu", "7.1.4"],
+    "legal_excerpt_az": "§7.1.3–§7.1.4 kataloqdan həll məlumatlarının qəbul/ötürülmə mexanizmini müəyyən edir.",
+    "example_az": "dxeit_kataloqu"
+  },
+
+  "requirements.source_type": {
+    "ui_label_az": "Mənbə növü",
+    "help_text_az": "Tələbin hansı mənbədən (normativ akt, standart, müqavilə və s.) yarandığını seçin.",
+    "allowed_values": ["normativ_akt", "standart", "müqavilə", "öhdəlik", "qabaqcıl_təcrübə", "praktik_tələbat"],
+    "legal_ref": "Əlavə, §2.1.2",
+    "pdf_page": 13,
+    "pdf_anchor": "2.1.2",
+    "search_terms_az": ["2.1.2", "tələbin mənbəyi"],
+    "legal_excerpt_az": "Əlavənin §2.1.2 bəndi tələbin mənbə növlərinin qeyd olunmasını açıq şəkildə tələb edir.",
+    "example_az": "standart"
+  },
+  "requirements.activity_area": {
+    "ui_label_az": "Fəaliyyət sahəsi",
+    "help_text_az": "Tələbin aid olduğu bir və ya bir neçə fəaliyyət sahəsini seçin.",
+    "allowed_values": null,
+    "legal_ref": "Əlavə, §2.1.3",
+    "pdf_page": 13,
+    "pdf_anchor": "2.1.3",
+    "search_terms_az": ["2.1.3", "fəaliyyət sahəsi"],
+    "legal_excerpt_az": "Əlavənin §2.1.3 bəndi tələbin qoyulduğu fəaliyyət sahəsinin qeydini məcburi edir.",
+    "example_az": "İKT sistemləri"
+  },
+
+  "dashboard.kpi": {
+    "ui_label_az": "KPI göstəricisi",
+    "help_text_az": "KPI panelində risk və insident uyğunluğuna aid ölçülərin monitorinqi aparılır.",
+    "allowed_values": null,
+    "legal_ref": "§4.2.4, §6.1.5, §10.2.1.5",
+    "pdf_page": 11,
+    "pdf_anchor": "10.2.1.5",
+    "search_terms_az": ["10.2.1.5", "uyğunluq dərəcələri", "4.2.4", "6.1.5"],
+    "legal_excerpt_az": "KPI-lar risk dəyərləndirməsi (§4.2.4), insident cavabı (§6.1.5) və uyğunluq dərəcələri (§10.2.1.5) arasında əlaqəni izləməyə xidmət edir.",
+    "example_az": "Qalıq risk > tolerantlıq olan qeydlərin faizi"
+  }
+}
