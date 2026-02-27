@@ -14,6 +14,7 @@ import { writeAuditLog } from '../middleware/auditLog';
 import { validatePassword } from '../utils/passwordPolicy';
 import { logger } from '../utils/logger';
 import { ldapService } from '../services/ldap';
+import { mailService } from '../utils/mailer';
 
 export const authRouter = Router();
 
@@ -125,6 +126,11 @@ authRouter.post('/login', loginRateLimiter, async (req: Request, res: Response) 
       if (newAttempts >= MAX_LOGIN_ATTEMPTS) {
         updates.locked_until = new Date(Date.now() + LOCK_DURATION_MS);
         logger.warn(`Hesab kilitləndi: ${email} (${newAttempts} uğursuz cəhd)`);
+
+        // Asinxron olaraq bildiriş göndər
+        const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'Məlum deyil';
+        const lockMinutes = LOCK_DURATION_MS / 60000;
+        mailService.sendAccountLockNotification(user.email, Array.isArray(ip) ? ip[0] : ip, lockMinutes).catch(() => { });
       }
       await db('users').where({ id: user.id }).update(updates);
       res.status(401).json({ error: 'Yanlış email və ya şifrə' });
@@ -283,4 +289,88 @@ authRouter.post('/register', authenticate, authorize('users:create'), async (req
   }
 });
 
+// ── PUT /api/auth/profile ─────────────────────────────────────
+authRouter.put('/profile', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const { full_name, department, position } = req.body;
 
+    if (!full_name) {
+      res.status(400).json({ error: 'Ad və soyad bölməsi boş qala bilməz' });
+      return;
+    }
+
+    await db('users')
+      .where({ id: req.user!.userId })
+      .update({
+        full_name,
+        department: department || null,
+        position: position || null,
+      });
+
+    await writeAuditLog({
+      entity_type: 'user', entity_id: req.user!.userId, action: 'update',
+      changed_fields: { full_name, department, position },
+      actor_user_id: req.user?.userId, actor_role: req.user?.role,
+    });
+
+    res.json({ message: 'Profil uğurla yeniləndi' });
+  } catch (error) {
+    logger.error('Profil yeniləmə xətası:', error);
+    res.status(500).json({ error: 'Profil yenilənərkən xəta baş verdi' });
+  }
+});
+
+// ── PUT /api/auth/profile/password ────────────────────────────
+authRouter.put('/profile/password', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const { current_password, new_password } = req.body;
+
+    if (!current_password || !new_password) {
+      res.status(400).json({ error: 'Cari və yeni şifrə daxil edilməlidir' });
+      return;
+    }
+
+    const pwCheck = validatePassword(new_password);
+    if (!pwCheck.valid) {
+      res.status(400).json({ error: pwCheck.message });
+      return;
+    }
+
+    const user = await db('users').where({ id: req.user!.userId }).first();
+    if (!user) {
+      res.status(404).json({ error: 'İstifadəçi tapılmadı' });
+      return;
+    }
+
+    if (user.auth_source === 'ldap') {
+      res.status(403).json({ error: 'LDAP/AD istifadəçiləri şifrəni bu portaldan dəyişə bilməz' });
+      return;
+    }
+
+    const validPassword = await bcrypt.compare(current_password, user.password_hash);
+    if (!validPassword) {
+      res.status(401).json({ error: 'Cari şifrə yanlışdır' });
+      return;
+    }
+
+    const newHash = await bcrypt.hash(new_password, 12);
+
+    await db('users').where({ id: user.id }).update({ password_hash: newHash });
+
+    await writeAuditLog({
+      entity_type: 'user', entity_id: user.id, action: 'update',
+      changed_fields: { password_hash: '[REDACTED]' },
+      actor_user_id: req.user?.userId, actor_role: req.user?.role,
+    });
+
+    res.json({ message: 'Şifrə uğurla yeniləndi' });
+
+    // Asinxron olaraq bildiriş göndər
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'Məlum deyil';
+    mailService.sendPasswordResetNotification(user.email, Array.isArray(ip) ? ip[0] : ip).catch(() => { });
+
+  } catch (error) {
+    logger.error('Şifrə yeniləmə xətası:', error);
+    res.status(500).json({ error: 'Şifrə yenilənərkən xəta baş verdi' });
+  }
+});

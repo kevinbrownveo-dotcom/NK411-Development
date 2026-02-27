@@ -19,6 +19,7 @@ import LegalRiskRegisterRedirect from './pages/legal/LegalRiskRegisterRedirect';
 import UsersPage from './pages/admin/UsersPage';
 import RolesPage from './pages/admin/RolesPage';
 import LdapMappingPage from './pages/admin/LdapMappingPage';
+import ProfilePage from './pages/ProfilePage';
 import { usePermission } from './hooks/usePermission';
 
 function ProtectedRoute({ children, resource }: { children: React.ReactNode; resource?: string }) {
@@ -78,6 +79,11 @@ export default function App() {
       <Route path="/admin/users" element={<AdminRoute><UsersPage /></AdminRoute>} />
       <Route path="/admin/roles" element={<AdminRoute><RolesPage /></AdminRoute>} />
       <Route path="/admin/ldap" element={<AdminRoute><LdapMappingPage /></AdminRoute>} />
+      <Route path="/profile" element={
+        <ProtectedRoute>
+          <ProfilePage />
+        </ProtectedRoute>
+      } />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

@@ -13,6 +13,7 @@ import { writeAuditLog } from '../middleware/auditLog';
 import { validatePassword } from '../utils/passwordPolicy';
 import { logger } from '../utils/logger';
 import { permissionsCache } from '../middleware/rbac';
+import { mailService } from '../utils/mailer';
 
 export const adminRouter = Router();
 
@@ -253,6 +254,14 @@ adminRouter.post('/users/:id/reset-password', authorize('users:update'), async (
     });
 
     res.json({ message: 'Şifrə sıfırlandı', ...(generated && { temporary_password: password }) });
+
+    // Asinxron olaraq bildiriş göndər (istifadəçiyə)
+    const userForEmail = await db('users').where({ id: req.params.id }).select('email').first();
+    if (userForEmail) {
+      const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'Məlum deyil';
+      mailService.sendPasswordResetNotification(userForEmail.email, Array.isArray(ip) ? ip[0] : ip).catch(() => { });
+    }
+
   } catch (error) {
     logger.error('Reset password xəta:', error);
     res.status(500).json({ error: 'Şifrə sıfırlanarkən xəta' });

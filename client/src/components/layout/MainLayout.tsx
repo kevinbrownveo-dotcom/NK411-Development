@@ -73,6 +73,8 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       disabled: true,
     },
     { type: 'divider' as const },
+    { key: '/profile', icon: <UserOutlined />, label: 'Profil Ayarları' },
+    { type: 'divider' as const },
     { key: 'logout', icon: <LogoutOutlined />, label: 'Çıxış', danger: true },
   ];
 
@@ -112,7 +114,10 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         }}>
           <Dropdown menu={{
             items: userMenuItems,
-            onClick: ({ key }) => { if (key === 'logout') logout(); },
+            onClick: ({ key }) => {
+              if (key === 'logout') logout();
+              else if (key === '/profile') navigate(key);
+            },
           }}>
             <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
               <Avatar icon={<UserOutlined />} />

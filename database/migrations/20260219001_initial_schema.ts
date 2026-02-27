@@ -7,7 +7,7 @@ export async function up(knex: Knex): Promise<void> {
   // ============================================================
   // 1. users — İstifadəçilər + 6 rol
   // ============================================================
-  await knex.schema.createTable('users', (t) => {
+  await knex.schema.createTable('users', (t: Knex.TableBuilder) => {
     t.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'));
     t.string('email').unique().notNullable();
     t.string('password_hash').notNullable();
@@ -32,7 +32,7 @@ export async function up(knex: Knex): Promise<void> {
   // 2. assets — Aktiv Kataloqu (Modul 1)
   // Qayda §4.2.2.1
   // ============================================================
-  await knex.schema.createTable('assets', (t) => {
+  await knex.schema.createTable('assets', (t: Knex.TableBuilder) => {
     t.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'));
     t.string('asset_code').unique().notNullable(); // AST-YYYY-XXXX
     t.string('name').notNullable();
@@ -59,7 +59,7 @@ export async function up(knex: Knex): Promise<void> {
   // 3. requirements — Tələblər (Modul 7 + PATCH-02)
   // Qayda Əlavəsi §2.1
   // ============================================================
-  await knex.schema.createTable('requirements', (t) => {
+  await knex.schema.createTable('requirements', (t: Knex.TableBuilder) => {
     t.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'));
     t.string('req_code').unique().notNullable(); // REQ-YYYY-XXXX
     t.string('req_title').notNullable();
@@ -86,7 +86,7 @@ export async function up(knex: Knex): Promise<void> {
   // ============================================================
   // 3b. requirements_history — Tələb versiyaları (PATCH-02)
   // ============================================================
-  await knex.schema.createTable('requirements_history', (t) => {
+  await knex.schema.createTable('requirements_history', (t: Knex.TableBuilder) => {
     t.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'));
     t.uuid('requirement_id').references('id').inTable('requirements').onDelete('CASCADE').notNullable();
     t.integer('version_number').notNullable();
@@ -100,7 +100,7 @@ export async function up(knex: Knex): Promise<void> {
   // 4. threats — Təhdid Kataloqu (Modul 2 + PATCH-03)
   // Qayda §4.2.2.2, §5.5.2, Əlavə §3
   // ============================================================
-  await knex.schema.createTable('threats', (t) => {
+  await knex.schema.createTable('threats', (t: Knex.TableBuilder) => {
     t.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'));
     t.string('threat_code').unique().notNullable(); // THR-YYYY-XXXX
     t.string('name').notNullable();
@@ -137,7 +137,7 @@ export async function up(knex: Knex): Promise<void> {
   // 5. vulnerabilities — Boşluq / Uyğunsuzluq (Modul 3 + PATCH-05)
   // Qayda §4.2.2.4
   // ============================================================
-  await knex.schema.createTable('vulnerabilities', (t) => {
+  await knex.schema.createTable('vulnerabilities', (t: Knex.TableBuilder) => {
     t.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'));
     t.string('vuln_code').unique().notNullable(); // VLN-YYYY-XXXX
     t.string('name').notNullable();
@@ -173,7 +173,7 @@ export async function up(knex: Knex): Promise<void> {
   // 6. risks — Əsas Risk Cədvəli (Modul 4 + PATCH-07)
   // Qayda §4.2.3 — Hesablama formulları
   // ============================================================
-  await knex.schema.createTable('risks', (t) => {
+  await knex.schema.createTable('risks', (t: Knex.TableBuilder) => {
     t.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'));
     t.string('risk_code').unique().notNullable(); // RSK-YYYY-XXXX
     t.string('name').notNullable();
@@ -219,7 +219,7 @@ export async function up(knex: Knex): Promise<void> {
   // ============================================================
   // 7. risk_assets — Risk ↔ Aktiv M2M
   // ============================================================
-  await knex.schema.createTable('risk_assets', (t) => {
+  await knex.schema.createTable('risk_assets', (t: Knex.TableBuilder) => {
     t.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'));
     t.uuid('risk_id').references('id').inTable('risks').onDelete('CASCADE').notNullable();
     t.uuid('asset_id').references('id').inTable('assets').onDelete('CASCADE').notNullable();
@@ -230,7 +230,7 @@ export async function up(knex: Knex): Promise<void> {
   // ============================================================
   // 8. risk_threats — Risk ↔ Təhdid + PATCH-03
   // ============================================================
-  await knex.schema.createTable('risk_threats', (t) => {
+  await knex.schema.createTable('risk_threats', (t: Knex.TableBuilder) => {
     t.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'));
     t.uuid('risk_id').references('id').inTable('risks').onDelete('CASCADE').notNullable();
     t.uuid('threat_id').references('id').inTable('threats').onDelete('CASCADE').notNullable();
@@ -244,7 +244,7 @@ export async function up(knex: Knex): Promise<void> {
   // ============================================================
   // 9. risk_vulnerabilities — Risk ↔ Boşluq M2M
   // ============================================================
-  await knex.schema.createTable('risk_vulnerabilities', (t) => {
+  await knex.schema.createTable('risk_vulnerabilities', (t: Knex.TableBuilder) => {
     t.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'));
     t.uuid('risk_id').references('id').inTable('risks').onDelete('CASCADE').notNullable();
     t.uuid('vulnerability_id').references('id').inTable('vulnerabilities').onDelete('CASCADE').notNullable();
@@ -256,7 +256,7 @@ export async function up(knex: Knex): Promise<void> {
   // 10. consequences — Fəsadlar (PATCH-06)
   // Qayda §4.2.2.6, Əlavə §4
   // ============================================================
-  await knex.schema.createTable('consequences', (t) => {
+  await knex.schema.createTable('consequences', (t: Knex.TableBuilder) => {
     t.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'));
     t.uuid('risk_id').references('id').inTable('risks').onDelete('CASCADE').notNullable();
     t.enum('consequence_category', [
@@ -279,7 +279,7 @@ export async function up(knex: Knex): Promise<void> {
   // 11. incidents — İnsident Reyestri (Modul 5 + PATCH-07)
   // Qayda §4.3.4, §6.1.5
   // ============================================================
-  await knex.schema.createTable('incidents', (t) => {
+  await knex.schema.createTable('incidents', (t: Knex.TableBuilder) => {
     t.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'));
     t.string('incident_code').unique().notNullable(); // INC-YYYY-XXXX
     t.uuid('risk_id').references('id').inTable('risks').nullable();
@@ -314,7 +314,7 @@ export async function up(knex: Knex): Promise<void> {
   // ============================================================
   // 12. incident_actions — İnsident cavab addımları
   // ============================================================
-  await knex.schema.createTable('incident_actions', (t) => {
+  await knex.schema.createTable('incident_actions', (t: Knex.TableBuilder) => {
     t.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'));
     t.uuid('incident_id').references('id').inTable('incidents').onDelete('CASCADE').notNullable();
     t.string('action_title').notNullable();
@@ -330,7 +330,7 @@ export async function up(knex: Knex): Promise<void> {
   // 13. solutions — Həllər Kataloqu (Modul 6)
   // Qayda §5.5.3, §6.2
   // ============================================================
-  await knex.schema.createTable('solutions', (t) => {
+  await knex.schema.createTable('solutions', (t: Knex.TableBuilder) => {
     t.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'));
     t.string('solution_code').unique().notNullable(); // SOL-YYYY-XXXX
     t.string('name').notNullable();
@@ -354,7 +354,7 @@ export async function up(knex: Knex): Promise<void> {
   // ============================================================
   // 14. risk_solutions — Risk ↔ Həll M2M
   // ============================================================
-  await knex.schema.createTable('risk_solutions', (t) => {
+  await knex.schema.createTable('risk_solutions', (t: Knex.TableBuilder) => {
     t.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'));
     t.uuid('risk_id').references('id').inTable('risks').onDelete('CASCADE').notNullable();
     t.uuid('solution_id').references('id').inTable('solutions').onDelete('CASCADE').notNullable();
@@ -366,7 +366,7 @@ export async function up(knex: Knex): Promise<void> {
   // 15. thresholds — Hədlər (Modul 7 + PATCH-04)
   // Qayda §2.2
   // ============================================================
-  await knex.schema.createTable('thresholds', (t) => {
+  await knex.schema.createTable('thresholds', (t: Knex.TableBuilder) => {
     t.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'));
     t.enum('threshold_type', [
       'MAO', 'MBCO', 'Maturity', 'EAL', 'SLA', 'OLA',
@@ -391,7 +391,7 @@ export async function up(knex: Knex): Promise<void> {
   // 16. reconciliations — Uzlaşdırma / Mapping (PATCH-01)
   // Qayda §1.8, §7.1.3–7.1.4
   // ============================================================
-  await knex.schema.createTable('reconciliations', (t) => {
+  await knex.schema.createTable('reconciliations', (t: Knex.TableBuilder) => {
     t.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'));
     t.enum('entity_type', [
       'risk', 'asset', 'threat', 'vulnerability', 'incident',
@@ -415,7 +415,7 @@ export async function up(knex: Knex): Promise<void> {
   // ============================================================
   // 16b. mapping_rules — Uzlaşdırma qaydaları (PATCH-01)
   // ============================================================
-  await knex.schema.createTable('mapping_rules', (t) => {
+  await knex.schema.createTable('mapping_rules', (t: Knex.TableBuilder) => {
     t.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'));
     t.string('name').notNullable();
     t.enum('entity_type', [
@@ -429,7 +429,7 @@ export async function up(knex: Knex): Promise<void> {
   });
 
   // Add FK from reconciliations to mapping_rules
-  await knex.schema.alterTable('reconciliations', (t) => {
+  await knex.schema.alterTable('reconciliations', (t: Knex.TableBuilder) => {
     t.foreign('mapping_rule_id').references('id').inTable('mapping_rules');
   });
 
@@ -437,7 +437,7 @@ export async function up(knex: Knex): Promise<void> {
   // 17. audit_log — Tam Audit İzi (PATCH-08)
   // Qayda §9.3, §9.5
   // ============================================================
-  await knex.schema.createTable('audit_log', (t) => {
+  await knex.schema.createTable('audit_log', (t: Knex.TableBuilder) => {
     t.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'));
     t.string('entity_type').notNullable(); // risk, asset, threat, vuln, etc.
     t.uuid('entity_id').notNullable();
