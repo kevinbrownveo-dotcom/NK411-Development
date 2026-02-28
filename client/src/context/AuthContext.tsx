@@ -3,7 +3,8 @@ import api from '../services/api';
 import { User, AuthState } from '../types';
 
 interface AuthContextType extends AuthState {
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<{ mfaRequired?: boolean; tempToken?: string } | void>;
+  verifyMfa: (tempToken: string, code: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -12,8 +13,9 @@ const AuthContext = createContext<AuthContextType>({
   accessToken: null,
   isAuthenticated: false,
   loading: true,
-  login: async () => {},
-  logout: () => {},
+  login: async () => { },
+  verifyMfa: async () => { },
+  logout: () => { },
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -59,6 +61,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string) => {
     const { data } = await api.post('/auth/login', { email, password });
+
+    // Epic 4.2: MFA yoxlaması
+    if (data.mfaRequired) {
+      return { mfaRequired: true, tempToken: data.tempToken };
+    }
+
     const user = data.user;
     if (!user || !data.accessToken) {
       throw new Error('Serverdən gözlənilməz cavab');
@@ -73,15 +81,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+  const verifyMfa = async (tempToken: string, code: string) => {
+    const { data } = await api.post('/auth/login/mfa-verify', { tempToken, code });
+    const user = data.user;
+    if (!user || !data.accessToken) {
+      throw new Error('Yalnış MFA kodu və ya server xətası');
+    }
+    localStorage.setItem('accessToken', data.accessToken);
+    localStorage.setItem('refreshToken', data.refreshToken);
+    setState({
+      user: { ...user, fullName: user.fullName || user.full_name, permissions: data.permissions || [] },
+      accessToken: data.accessToken,
+      isAuthenticated: true,
+      loading: false,
+    });
+  };
+
   const logout = () => {
-    api.post('/auth/logout').catch(() => {});
+    api.post('/auth/logout').catch(() => { });
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     setState({ user: null, accessToken: null, isAuthenticated: false, loading: false });
   };
 
   return (
-    <AuthContext.Provider value={{ ...state, login, logout }}>
+    <AuthContext.Provider value={{ ...state, login, verifyMfa, logout }}>
       {children}
     </AuthContext.Provider>
   );

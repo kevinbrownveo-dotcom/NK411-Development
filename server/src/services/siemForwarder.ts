@@ -257,3 +257,44 @@ export async function reloadDestinations(): Promise<void> {
 
 // Initial load with delay (after DB connection ready)
 setTimeout(() => loadDestinations(), 3000);
+
+// ── Heartbeat Generator (Epic 2.1) ──────────────────────
+let heartbeatInterval: NodeJS.Timeout | null = null;
+
+export function startHeartbeat(): void {
+    if (heartbeatInterval) return;
+    logger.info('SIEM Heartbeat generator başladıldı (60s)');
+    heartbeatInterval = setInterval(() => {
+        if (!globalEnabled) return;
+
+        const heartbeatEntry: LogEntry = {
+            '@timestamp': new Date().toISOString(),
+            event_type: 'SYSTEM_HEARTBEAT',
+            action: 'ping',
+            result: 'SUCCESS',
+            severity: 'INFO',
+            entity_type: 'system',
+            entity_id: 'siem_forwarder',
+            metadata: {
+                host: 'risk-registry',
+                uptime: process.uptime(),
+                active_destinations: destinations.length
+            }
+        };
+
+        // Suppress errors for heartbeat specifically to avoid log spam if SIEM is down
+        for (const dest of destinations) {
+            if (dest.is_active) {
+                sendWithRetry(dest, heartbeatEntry).catch(() => { });
+            }
+        }
+    }, 60000);
+}
+
+export function stopHeartbeat(): void {
+    if (heartbeatInterval) {
+        clearInterval(heartbeatInterval);
+        heartbeatInterval = null;
+        logger.info('SIEM Heartbeat generator dayandırıldı');
+    }
+}

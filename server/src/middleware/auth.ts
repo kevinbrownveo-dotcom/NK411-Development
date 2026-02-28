@@ -2,6 +2,11 @@ import { Request, Response, NextFunction } from 'express';
 import jwt, { Secret, SignOptions } from 'jsonwebtoken';
 import { randomBytes } from 'crypto';
 import { isBlacklisted } from '../services/tokenBlacklist';
+import db from '../config/database';
+
+// In-memory cache for user active status to prevent hitting the DB on every single API request
+const USER_ACTIVE_CACHE = new Map<string, { active: boolean, expiresAt: number }>();
+const CACHE_TTL_MS = 5000; // 5 seconds
 
 export interface JwtPayload {
   userId: string;
@@ -76,6 +81,32 @@ export async function authenticate(req: AuthRequest, res: Response, next: NextFu
       const blacklisted = await isBlacklisted(decoded.jti, decoded.userId, iat);
       if (blacklisted) {
         res.status(401).json({ error: 'Token ləğv edilib (Sistemdən çıxarılmısınız)' });
+        return;
+      }
+
+      // Epic 1.3: Per-Request Active Check (with 5s cache to avoid DB spam)
+      const now = Date.now();
+      let isActive = true;
+
+      const cached = USER_ACTIVE_CACHE.get(decoded.userId);
+      if (cached && cached.expiresAt > now) {
+        isActive = cached.active;
+      } else {
+        // Check DB
+        try {
+          const dbUser = await db('users').select('is_active', 'locked_until').where({ id: decoded.userId }).first();
+          if (!dbUser || !dbUser.is_active || (dbUser.locked_until && new Date(dbUser.locked_until).getTime() > now)) {
+            isActive = false;
+          }
+          USER_ACTIVE_CACHE.set(decoded.userId, { active: isActive, expiresAt: now + CACHE_TTL_MS });
+        } catch (err) {
+          // If DB is down, fail open defensively? No, assume active if DB fails, or fail closed. Let's fail open to avoid catastrophic outage if DB blips
+          isActive = true;
+        }
+      }
+
+      if (!isActive) {
+        res.status(401).json({ error: 'Hesabınız passivləşdirilib və ya kilitlənib' });
         return;
       }
     }

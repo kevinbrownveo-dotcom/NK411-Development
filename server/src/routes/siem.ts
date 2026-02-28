@@ -11,6 +11,7 @@ import { authenticate, AuthRequest } from '../middleware/auth';
 import { authorize } from '../middleware/rbac';
 import { writeAuditLog, verifyAuditChain } from '../middleware/auditLog';
 import { logger } from '../utils/logger';
+import { mailService } from '../utils/mailer';
 import db from '../config/database';
 import { isForwardingEnabled, setForwardingEnabled, sendTestLog, reloadDestinations, getLogLevel, setLogLevel } from '../services/siemForwarder';
 
@@ -32,12 +33,21 @@ siemRouter.post('/forwarding-status', authenticate, authorize('users:update'),
     async (req: AuthRequest, res: Response) => {
         const { enabled } = req.body;
         setForwardingEnabled(!!enabled);
+
         await writeAuditLog({
             entity_type: 'siem_config', entity_id: 'forwarding-toggle',
             action: 'update', changed_fields: { forwarding_enabled: enabled },
             actor_user_id: req.user!.userId, actor_role: req.user!.role,
             ip_address: req.ip,
         });
+
+        // Epic 2.2: Critical Alert if SIEM is disabled
+        if (!enabled) {
+            const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || req.ip || 'Naməlum';
+            const identifier = `${req.user!.email} (Rolu: ${req.user!.role})`;
+            mailService.sendSiemDisabledAlert(Array.isArray(ip) ? ip[0] : ip, identifier).catch(() => { });
+        }
+
         res.json({ enabled: isForwardingEnabled(), logLevel: getLogLevel() });
     }
 );

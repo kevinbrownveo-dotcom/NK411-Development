@@ -4,6 +4,7 @@ import { UserOutlined, LockOutlined, SaveOutlined } from '@ant-design/icons';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { validatePassword } from '../utils/passwordPolicy';
+import MfaSetup from '../components/common/MfaSetup';
 
 const { Title } = Typography;
 
@@ -99,6 +100,10 @@ export default function ProfilePage() {
           </Button>
         </Form>
       </Card>
+
+      <div style={{ marginBottom: 24 }}>
+        <MfaSetup />
+      </div>
 
       <Card>
         <Title level={5}>

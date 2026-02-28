@@ -74,6 +74,15 @@ class MailService {
             text: `Çox sayda uğursuz giriş cəhdinə görə hesabınız ${minutes} dəqiqəliyində kilidləndi.\nIP: ${ip}\nVaxt: ${new Date().toLocaleString('az-AZ')}`,
         });
     }
+
+    public async sendSiemDisabledAlert(ip: string, userIdentifier: string): Promise<void> {
+        // Həyəcan siqnalını mərkəzi SOC və ya Təhlükəsizlik rəhbərinə göndər
+        await this.sendMail({
+            to: process.env.SOC_ALERT_EMAIL || 'soc@risk-registry.az',
+            subject: '⚠️ TƏHLÜKƏSİZLİK XƏBƏRDARLIĞI: SIEM Foward Disable Edilib!',
+            text: `DİQQƏT: Sistemdə SIEM (Log Forwarding) funksiyası söndürülmüşdür!\n\nVaxt: ${new Date().toLocaleString('az-AZ')}\nİstifadəçi ID: ${userIdentifier}\nIP: ${ip}\n\nBu cəhd sizin tərəfinizdən edilməyibsə, dərhal sistemə baxış keçirin.`,
+        });
+    }
 }
 
 export const mailService = new MailService();

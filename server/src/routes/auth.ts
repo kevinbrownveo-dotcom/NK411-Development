@@ -7,6 +7,7 @@ import {
   generateRefreshToken,
   verifyToken,
   authenticate,
+  generateMfaTempToken,
   AuthRequest,
 } from '../middleware/auth';
 import { authorize } from '../middleware/rbac';
@@ -15,6 +16,8 @@ import { validatePassword } from '../utils/passwordPolicy';
 import { logger, logSecurityEvent } from '../utils/logger';
 import { ldapService } from '../services/ldap';
 import { mailService } from '../utils/mailer';
+import { generateMfaSecret, verifyTOTP, generateBackupCodes, verifyBackupCode } from '../services/mfa';
+import { blacklistToken } from '../services/tokenBlacklist';
 
 export const authRouter = Router();
 
@@ -171,7 +174,18 @@ authRouter.post('/login', loginRateLimiter, async (req: Request, res: Response) 
       return;
     }
 
-    // Uğurlu giriş — cəhd sayğacını sıfırla
+    // ── MFA Check (Epic 1.1) ───────────────────────────────────
+    if (user.mfa_enabled) {
+      const tempToken = generateMfaTempToken(user.id);
+      res.json({
+        mfaRequired: true,
+        tempToken,
+        user: { id: user.id, email: user.email, fullName: user.full_name, role: user.role, department: user.department },
+      });
+      return;
+    }
+
+    // Uğurlu giriş (MFA yoxdursa) — cəhd sayğacını sıfırla
     const payload = { userId: user.id, email: user.email, role: user.role, fullName: user.full_name };
     const accessToken = generateAccessToken(payload);
     const refreshToken = generateRefreshToken(payload);
@@ -204,6 +218,88 @@ authRouter.post('/login', loginRateLimiter, async (req: Request, res: Response) 
   } catch (error) {
     logger.error('Login xəta:', error);
     res.status(500).json({ error: 'Giriş zamanı xəta baş verdi' });
+  }
+});
+
+// ── POST /api/auth/login/mfa-verify ─────────────────────────
+authRouter.post('/login/mfa-verify', async (req: Request, res: Response) => {
+  try {
+    const { tempToken, code } = req.body;
+    if (!tempToken || !code) {
+      res.status(400).json({ error: 'Token və təsdiq kodu tələb olunur' });
+      return;
+    }
+
+    let decoded: any;
+    try {
+      decoded = verifyToken(tempToken);
+      if (!decoded.isMfaFlow) throw new Error('Etibarsız token tipli');
+    } catch {
+      res.status(401).json({ error: 'MFA sessiyasının vaxtı bitib və ya etibarsızdır' });
+      return;
+    }
+
+    const user = await db('users').where({ id: decoded.userId }).first();
+    if (!user || !user.mfa_enabled || !user.mfa_secret) {
+      res.status(400).json({ error: 'MFA aktiv deyil' });
+      return;
+    }
+
+    let isValid = false;
+    let usedBackupCode = false;
+
+    // 1. Try TOTP code
+    isValid = verifyTOTP(user.mfa_secret, code);
+
+    // 2. Try Backup Codes if TOTP failed
+    if (!isValid && user.mfa_backup_codes && code.length === 8) {
+      const backupCodes = JSON.parse(user.mfa_backup_codes);
+      const codeIndex = verifyBackupCode(code, backupCodes);
+      if (codeIndex !== -1) {
+        isValid = true;
+        usedBackupCode = true;
+        // Remove used code
+        backupCodes.splice(codeIndex, 1);
+        await db('users').where({ id: user.id }).update({ mfa_backup_codes: JSON.stringify(backupCodes) });
+      }
+    }
+
+    if (!isValid) {
+      // Log failed MFA 
+      logSecurityEvent({
+        event_type: 'MFA_FAIL', user_id: user.id, role_snapshot: user.role,
+        source_ip: (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || undefined,
+        result: 'FAIL', reason_code: 'INVALID_MFA_CODE', severity: 'WARN',
+      }).catch(() => { });
+
+      res.status(401).json({ error: 'Yanlış MFA kodu' });
+      return;
+    }
+
+    // Uğurlu MFA giriş
+    const payload = { userId: user.id, email: user.email, role: user.role, fullName: user.full_name };
+    const accessToken = generateAccessToken(payload);
+    const refreshToken = generateRefreshToken(payload);
+    const refreshHash = await bcrypt.hash(refreshToken, 8);
+
+    await db('users').where({ id: user.id }).update({
+      refresh_token: refreshHash, last_login: new Date(),
+      login_attempts: 0, failed_login_count: 0, locked_until: null, lockout_level: 0,
+    });
+
+    logSecurityEvent({
+      event_type: 'LOGIN_SUCCESS', user_id: user.id, role_snapshot: user.role,
+      source_ip: (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || undefined,
+      result: 'SUCCESS', severity: 'INFO', metadata: { mfa_used: true, used_backup: usedBackupCode }
+    }).catch(() => { });
+
+    res.json({
+      accessToken, refreshToken,
+      user: { id: user.id, email: user.email, fullName: user.full_name, role: user.role, department: user.department },
+    });
+  } catch (error) {
+    logger.error('MFA Verify xəta:', error);
+    res.status(500).json({ error: 'MFA yoxlanılarkən xəta baş verdi' });
   }
 });
 
@@ -255,6 +351,14 @@ authRouter.post('/refresh', async (req: Request, res: Response) => {
 authRouter.post('/logout', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     await db('users').where({ id: req.user!.userId }).update({ refresh_token: null });
+
+    // Epic 1.2: Instant Token Revocation (Blacklist)
+    if (req.user!.jti) {
+      // Assuming access tokens are max 15m, we blacklist until expiration to prevent bloat
+      const expiry = new Date(Date.now() + 15 * 60 * 1000);
+      await blacklistToken(req.user!.jti, expiry, req.user!.userId, 'logout');
+    }
+
     res.json({ message: 'Uğurla çıxış edildi' });
   } catch (error) {
     logger.error('Logout xəta:', error);
@@ -270,13 +374,13 @@ authRouter.get('/me', authenticate, async (req: AuthRequest, res: Response) => {
       .select(
         'u.id', 'u.email', 'u.full_name', 'u.role', 'u.role_id',
         'r.name as role_name', 'r.label as role_label',
-        'u.department', 'u.position', 'u.last_login',
+        'u.department', 'u.position', 'u.last_login', 'u.mfa_enabled'
       )
-      .where({ 'u.id': req.user!.userId })
+      .where({ 'u.id': req.user!.userId, 'u.is_active': true })
       .first();
 
     if (!user) {
-      res.status(404).json({ error: 'İstifadəçi tapılmadı' });
+      res.status(404).json({ error: 'İstifadəçi tapılmadı və ya passivdir' });
       return;
     }
 
@@ -419,5 +523,83 @@ authRouter.put('/profile/password', authenticate, async (req: AuthRequest, res: 
   } catch (error) {
     logger.error('Şifrə yeniləmə xətası:', error);
     res.status(500).json({ error: 'Şifrə yenilənərkən xəta baş verdi' });
+  }
+});
+
+// ── POST /api/auth/mfa/setup ─────────────────────────────────
+authRouter.post('/mfa/setup', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const user = await db('users').where({ id: req.user!.userId }).first();
+    if (!user) { res.status(404).json({ error: 'İstifadəçi tapılmadı' }); return; }
+
+    const setupData = await generateMfaSecret(user.email);
+
+    // Save secret temporarily (not fully active yet)
+    await db('users').where({ id: user.id }).update({ mfa_secret: setupData.secret });
+
+    res.json({
+      qrCodeUrl: setupData.qrCodeUrl,
+      secret: setupData.secret,
+      message: 'QR Kodu authenticator tətbiqi ilə oxudun'
+    });
+  } catch (error) {
+    logger.error('MFA setup error:', error);
+    res.status(500).json({ error: 'MFA konfiqurasiya edilərkən xəta baş verdi' });
+  }
+});
+
+// ── POST /api/auth/mfa/confirm ───────────────────────────────
+authRouter.post('/mfa/confirm', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const { code } = req.body;
+    if (!code) { res.status(400).json({ error: 'Təsdiq kodu daxil edilməlidir' }); return; }
+
+    const user = await db('users').where({ id: req.user!.userId }).first();
+    if (!user || !user.mfa_secret) { res.status(400).json({ error: 'MFA setup tapılmadı' }); return; }
+
+    const isValid = verifyTOTP(user.mfa_secret, code);
+    if (!isValid) { res.status(400).json({ error: 'MFA kodu yanlışdır' }); return; }
+
+    // Generate backup codes
+    const backupCodes = generateBackupCodes();
+
+    await db('users').where({ id: user.id }).update({
+      mfa_enabled: true,
+      mfa_enabled_at: new Date(),
+      mfa_backup_codes: JSON.stringify(backupCodes.hashed)
+    });
+
+    logSecurityEvent({
+      event_type: 'MFA_ENABLED', user_id: user.id, role_snapshot: user.role,
+      source_ip: req.ip, result: 'SUCCESS', severity: 'INFO'
+    }).catch(() => { });
+
+    res.json({
+      message: 'İki Faktorlu Doğrulama (MFA) uğurla aktivləşdirildi',
+      backupCodes: backupCodes.plain // Only shown once!
+    });
+  } catch (error) {
+    logger.error('MFA confirm error:', error);
+    res.status(500).json({ error: 'MFA təsdiqlənərkən xəta baş verdi' });
+  }
+});
+
+authRouter.post('/mfa/disable', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const { code } = req.body;
+    const user = await db('users').where({ id: req.user!.userId }).first();
+    if (!user || !user.mfa_enabled) { res.status(400).json({ error: 'MFA aktiv deyil' }); return; }
+
+    if (!code || !verifyTOTP(user.mfa_secret, code)) {
+      res.status(400).json({ error: 'Doğrulama kodu yanlışdır' }); return;
+    }
+
+    await db('users').where({ id: user.id }).update({
+      mfa_enabled: false, mfa_secret: null, mfa_backup_codes: null, mfa_enabled_at: null
+    });
+
+    res.json({ message: 'MFA deaktiv edildi' });
+  } catch (error) {
+    res.status(500).json({ error: 'Xəta baş verdi' });
   }
 });

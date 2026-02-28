@@ -12,6 +12,7 @@ export interface User {
   position?: string;
   last_login?: string;
   is_active?: boolean;
+  mfa_enabled?: boolean;
   auth_source?: 'local' | 'ldap';
   login_attempts?: number;
   locked_until?: string | null;
