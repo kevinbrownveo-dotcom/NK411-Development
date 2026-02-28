@@ -7,6 +7,8 @@ import {
 import api from '../../services/api';
 import { DashboardStats, KpiData } from '../../types';
 import FieldLabelWithHelp from '../../components/common/FieldLabelWithHelp';
+import DetailedKpiPanel from './DetailedKpiPanel';
+import SmartTargetsWidget from './SmartTargetsWidget';
 
 const { Title } = Typography;
 
@@ -29,15 +31,18 @@ function heatMapColor(prob: number, impact: number): string {
 export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [kpi, setKpi] = useState<KpiData | null>(null);
+  const [kpiDetailed, setKpiDetailed] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
       api.get('/dashboard/stats'),
       api.get('/dashboard/kpi'),
-    ]).then(([statsRes, kpiRes]) => {
+      api.get('/dashboard/kpi-detailed'),
+    ]).then(([statsRes, kpiRes, detailedRes]) => {
       setStats(statsRes.data);
       setKpi(kpiRes.data);
+      setKpiDetailed(detailedRes.data);
     }).catch(() => { })
       .finally(() => setLoading(false));
   }, []);
@@ -209,8 +214,12 @@ export default function DashboardPage() {
               )}
             </Row>
           </Card>
+          <SmartTargetsWidget kpi1Percent={kpi?.kpi1?.percentage ?? null} detailedData={kpiDetailed} />
         </Col>
       </Row>
+
+      {/* §10.2 Detailed 10+ KPI Progress Indikatorları */}
+      <DetailedKpiPanel data={kpiDetailed} loading={loading} />
     </div>
   );
 }
