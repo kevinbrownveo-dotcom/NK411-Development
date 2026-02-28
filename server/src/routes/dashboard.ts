@@ -50,6 +50,10 @@ dashboardRouter.get('/stats', authenticate, authorize('dashboard:read'),
         vulnerabilities: { openCount: parseInt(vulnCount?.count as string || '0') },
         threats: { totalCount: parseInt(threatCount?.count as string || '0') },
         heatMap: heatMapData,
+        financial: {
+          totalALE: await db('rr_core.risks').sum('total_ale_value as total').first().then(r => parseFloat(r?.total as string || '0')),
+          count: await db('rr_core.risks').where({ has_financial_assessment: true }).count('* as count').first().then(r => parseInt(r?.count as string || '0'))
+        }
       });
     } catch (error) {
       res.status(500).json({ error: 'Dashboard statistikaları alınarkən xəta' });

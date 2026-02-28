@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Row, Col, Card, Statistic, Tag, Spin, Typography } from 'antd';
 import {
   ExclamationCircleOutlined, AlertOutlined, BugOutlined,
-  LaptopOutlined,
+  LaptopOutlined, WalletOutlined,
 } from '@ant-design/icons';
 import api from '../../services/api';
 import { DashboardStats, KpiData } from '../../types';
@@ -108,6 +108,37 @@ export default function DashboardPage() {
               value={stats?.threats.totalCount || 0}
               prefix={<AlertOutlined />}
             />
+          </Card>
+        </Col>
+      </Row>
+
+      <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
+        <Col xs={24}>
+          <Card style={{ background: 'linear-gradient(90deg, #1677ff 0%, #003a8c 100%)', color: '#fff' }} bodyStyle={{ padding: '20px 30px' }}>
+            <Row align="middle" gutter={32}>
+              <Col flex="80px">
+                <div style={{ background: 'rgba(255,255,255,0.2)', width: 64, height: 64, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <WalletOutlined style={{ fontSize: 32, color: '#fff' }} />
+                </div>
+              </Col>
+              <Col flex="auto">
+                <Statistic
+                  title={<span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 16 }}>Ümumi Maliyyə Riski (ALE - Annualized Loss Expectancy)</span>}
+                  value={stats?.financial?.totalALE || 0}
+                  suffix={<span style={{ fontSize: 18, marginLeft: 8 }}>AZN / illik</span>}
+                  valueStyle={{ color: '#fff', fontSize: 32, fontWeight: 700 }}
+                  formatter={(val) => Number(val).toLocaleString()}
+                />
+              </Col>
+              <Col flex="200px" style={{ textAlign: 'right', borderLeft: '1px solid rgba(255,255,255,0.2)' }}>
+                <Statistic
+                  title={<span style={{ color: 'rgba(255,255,255,0.85)' }}>Kəmiyyət Analizi</span>}
+                  value={stats?.financial?.count || 0}
+                  suffix=" risk üzrə"
+                  valueStyle={{ color: '#fff', fontSize: 24 }}
+                />
+              </Col>
+            </Row>
           </Card>
         </Col>
       </Row>
