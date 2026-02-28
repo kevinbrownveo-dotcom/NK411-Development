@@ -40,7 +40,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     { key: '/risks', icon: <ExclamationCircleOutlined />, label: 'Risklər', resource: 'risks' },
     { key: '/incidents', icon: <SafetyOutlined />, label: 'İnsidentlər', resource: 'incidents' },
     { key: '/solutions', icon: <ToolOutlined />, label: 'Həllər', resource: 'solutions' },
-    { key: '/requirements', icon: <FileProtectOutlined />, label: 'Tələblər və Hədlər', resource: 'requirements' },
+    { key: '/consequences', icon: <ExclamationCircleOutlined />, label: 'Fəsadlar', resource: 'consequences' },
+    { key: '/thresholds', icon: <DatabaseOutlined />, label: 'Hədlər', resource: 'thresholds' },
+    { key: '/requirements', icon: <FileProtectOutlined />, label: 'Tələblər', resource: 'requirements' },
     { key: '/reconciliations', icon: <SwapOutlined />, label: 'Uzlaşdırma', resource: 'reconciliations' },
     { key: '/audit', icon: <AuditOutlined />, label: 'Audit Jurnalı', resource: 'audit' },
   ];

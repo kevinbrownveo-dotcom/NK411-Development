@@ -190,6 +190,35 @@ export interface Requirement {
   status: 'draft' | 'aktiv' | 'köhnəlmiş';
 }
 
+// Fəsad — PATCH-06
+export interface Consequence {
+  id: string;
+  risk_id: string;
+  consequence_category: 'continuity' | 'reputasiya' | 'maliyyə' | 'hüquqi' | 'əməliyyat' | 'texnoloji' | 'insan';
+  consequence_description: string;
+  probability_band_law: ProbabilityBand;
+  severity_law: SeverityLaw;
+  related_threat_id?: string;
+  related_requirement_id?: string;
+  evidence?: string;
+  created_at: string;
+}
+
+// Həd — Modul 7 + PATCH-04
+export interface Threshold {
+  id: string;
+  threshold_type: string;
+  applies_to_type: string;
+  applies_to_id?: string;
+  value: string;
+  unit?: string;
+  scale_definition?: any;
+  evidence_link?: string;
+  owner_role?: string;
+  review_frequency?: 'rüblük' | 'yarımillik' | 'illik';
+  created_at: string;
+}
+
 // Audit Log
 export interface AuditLogEntry {
   id: string;

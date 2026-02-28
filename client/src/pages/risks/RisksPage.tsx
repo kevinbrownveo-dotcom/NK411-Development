@@ -10,7 +10,10 @@ const PRIORITY_COLORS: Record<string, string> = {
 };
 
 const columns = [
-  { title: 'Kod', dataIndex: 'risk_code', key: 'risk_code', width: 150 },
+  {
+    title: 'Kod', dataIndex: 'risk_code', key: 'risk_code', width: 150,
+    render: (v: string, record: Risk) => <a href={`/risks/${record.id}`}>{v}</a>,
+  },
   { title: <FieldLabelWithHelp fieldKey="risks.name" label="Ad" />, dataIndex: 'name', key: 'name' },
   { title: 'Kateqoriya', dataIndex: 'category', key: 'category', width: 110 },
   {
