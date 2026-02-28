@@ -1,0 +1,36 @@
+{
+    "info": {
+        "name": "Risk Registry Compliance Pack",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Create Asset",
+            "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/assets"
+            }
+        },
+        {
+            "name": "Create Threat",
+            "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/threats"
+            }
+        },
+        {
+            "name": "Create Risk",
+            "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/risks"
+            }
+        },
+        {
+            "name": "Approve Risk - SoD Forbidden Test",
+            "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/risks/{{risk_id}}/approve"
+            }
+        }
+    ]
+}

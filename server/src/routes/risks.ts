@@ -3,6 +3,7 @@ import { createCrudRouter } from '../utils/crudFactory';
 import { generateCode } from '../utils/codeGenerator';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import { authorize } from '../middleware/rbac';
+import { writeAuditLog } from '../middleware/auditLog';
 import db from '../config/database';
 
 // Risk hesablama servisi — Qayda §4.2.3
@@ -46,10 +47,13 @@ function calculateRiskScores(data: any) {
 }
 
 export const riskRouter = createCrudRouter({
-  table: 'risks',
+  table: 'rr_core.risks',
   entityType: 'risk',
   permissionPrefix: 'risks',
   searchColumns: ['name', 'description'],
+  // DLP (RR-REQ-0035): admin olmayan istifadəçilər üçün həssas sahələri maskalayır
+  sensitiveColumns: ['description', 'treatment_method'],
+  dlpMaxLimit: 50,
   beforeCreate: async (data) => {
     data.risk_code = await generateCode('RSK');
     const scores = calculateRiskScores(data);
@@ -115,6 +119,52 @@ riskRouter.get('/:id/relations', authenticate, authorize('risks:read'),
       res.json({ assets, threats, vulnerabilities, consequences, solutions });
     } catch (error) {
       res.status(500).json({ error: 'Əlaqələr alınarkən xəta' });
+    }
+  }
+);
+
+// ── SoD: Risk təsdiqi (§3.1.4 — creator ≠ approver) ────────────
+riskRouter.put('/:id/approve', authenticate, authorize('risks:update'),
+  async (req: AuthRequest, res: Response) => {
+    try {
+      const risk = await db('risks').where({ id: req.params.id }).first();
+      if (!risk) {
+        res.status(404).json({ error: 'Risk tapılmadı' });
+        return;
+      }
+
+      // SoD: Yaradan özü təsdiqləyə bilməz
+      if (risk.created_by === req.user!.userId) {
+        res.status(403).json({
+          error: 'SoD pozuntusu: Riski yaradan şəxs onu təsdiqləyə bilməz (§3.1.4)',
+          created_by: risk.created_by,
+          approver: req.user!.userId,
+        });
+        return;
+      }
+
+      const [updated] = await db('risks')
+        .where({ id: req.params.id })
+        .update({
+          approved_by: req.user!.userId,
+          approved_at: new Date(),
+          updated_at: new Date(),
+        })
+        .returning('*');
+
+      await writeAuditLog({
+        entity_type: 'risk',
+        entity_id: req.params.id,
+        action: 'update',
+        changed_fields: { approved_by: req.user!.userId, approved_at: new Date() },
+        actor_user_id: req.user!.userId,
+        actor_role: req.user!.role,
+        ip_address: req.ip,
+      });
+
+      res.json(updated);
+    } catch (error) {
+      res.status(500).json({ error: 'Təsdiq zamanı xəta' });
     }
   }
 );

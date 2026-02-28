@@ -1,0 +1,5 @@
+RLS (Row Level Security) NOT USED. Access enforced at API only.
+
+**Qeyd:**
+- Ayrı-ayrı istifadəçilərin (tenantların) fərqli sətirlərə giriş məhdudiyyətlərini qorumaq üçün PostgreSQL-in RLS imkanından istifadə olunmamışdır. 
+- Əvəzində, bu təhlükəsizlik `users.role` icazələri üzərində \`req.user.role\` şərti ilə API-in mərkəzi \`authorize()\` middleware funksiyasında icra edilir.

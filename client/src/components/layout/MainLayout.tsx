@@ -4,7 +4,7 @@ import {
   DashboardOutlined, SafetyOutlined, BugOutlined, ExclamationCircleOutlined,
   AlertOutlined, ToolOutlined, FileProtectOutlined, AuditOutlined,
   DatabaseOutlined, SwapOutlined, LogoutOutlined, UserOutlined,
-  LaptopOutlined, NodeIndexOutlined,
+  LaptopOutlined, NodeIndexOutlined, TableOutlined,
   TeamOutlined, SafetyCertificateOutlined, ApiOutlined, SettingOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -57,6 +57,8 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         { key: '/admin/users', icon: <TeamOutlined />, label: 'İstifadəçilər' },
         { key: '/admin/roles', icon: <SafetyCertificateOutlined />, label: 'Rollar & İcazələr' },
         { key: '/admin/ldap', icon: <ApiOutlined />, label: 'LDAP / AD' },
+        { key: '/admin/rbac-matrix', icon: <TableOutlined />, label: 'RBAC Matris' },
+        { key: '/admin/siem', icon: <SafetyCertificateOutlined />, label: 'SIEM / Logging' },
       ],
     },
   ] : [];

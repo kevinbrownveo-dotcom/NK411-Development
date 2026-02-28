@@ -7,7 +7,7 @@ import { writeAuditLog } from '../middleware/auditLog';
 import db from '../config/database';
 
 export const threatRouter = createCrudRouter({
-  table: 'threats',
+  table: 'rr_central.threats',
   entityType: 'təhdid',
   permissionPrefix: 'threats',
   searchColumns: ['name', 'realization_tech'],

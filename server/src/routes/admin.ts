@@ -497,3 +497,68 @@ adminRouter.post('/ldap/test', async (_req: AuthRequest, res: Response) => {
     res.status(500).json({ error: 'LDAP testi zamanı xəta' });
   }
 });
+
+// ══════════════════════════════════════════════════════════════
+// GET /api/admin/rbac-matrix — §5.6.2 Rol bölgüsü matrisası
+// ══════════════════════════════════════════════════════════════
+adminRouter.get('/rbac-matrix', authenticate, authorize('users:read'),
+  async (_req: AuthRequest, res: Response) => {
+    const roles = ['admin', 'risk_manager', 'asset_owner', 'incident_coordinator', 'auditor', 'dxeit_rep'];
+    const modules = [
+      { key: 'assets', label: 'Aktivlər' },
+      { key: 'threats', label: 'Təhdidlər' },
+      { key: 'vulnerabilities', label: 'Boşluqlar' },
+      { key: 'risks', label: 'Risklər' },
+      { key: 'incidents', label: 'İnsidentlər' },
+      { key: 'solutions', label: 'Həllər' },
+      { key: 'requirements', label: 'Tələblər' },
+      { key: 'thresholds', label: 'Hədlər' },
+      { key: 'consequences', label: 'Fəsadlar' },
+      { key: 'reconciliations', label: 'Uzlaşdırma' },
+      { key: 'audit', label: 'Audit' },
+      { key: 'dashboard', label: 'Dashboard' },
+      { key: 'users', label: 'İstifadəçilər' },
+      { key: 'roles', label: 'Rollar' },
+    ];
+    const actions = ['read', 'create', 'update', 'delete'];
+
+    const pMap: Record<string, string[]> = {
+      'assets:read': ['admin', 'risk_manager', 'asset_owner', 'incident_coordinator', 'auditor', 'dxeit_rep'],
+      'assets:create': ['admin', 'risk_manager'], 'assets:update': ['admin', 'risk_manager', 'asset_owner'], 'assets:delete': ['admin'],
+      'threats:read': ['admin', 'risk_manager', 'asset_owner', 'incident_coordinator', 'auditor', 'dxeit_rep'],
+      'threats:create': ['admin', 'risk_manager'], 'threats:update': ['admin', 'risk_manager'], 'threats:delete': ['admin'],
+      'vulnerabilities:read': ['admin', 'risk_manager', 'asset_owner', 'auditor', 'dxeit_rep'],
+      'vulnerabilities:create': ['admin', 'risk_manager'], 'vulnerabilities:update': ['admin', 'risk_manager'], 'vulnerabilities:delete': ['admin'],
+      'risks:read': ['admin', 'risk_manager', 'asset_owner', 'incident_coordinator', 'auditor', 'dxeit_rep'],
+      'risks:create': ['admin', 'risk_manager'], 'risks:update': ['admin', 'risk_manager'], 'risks:delete': ['admin'],
+      'incidents:read': ['admin', 'risk_manager', 'incident_coordinator', 'auditor', 'dxeit_rep'],
+      'incidents:create': ['admin', 'risk_manager', 'incident_coordinator'], 'incidents:update': ['admin', 'risk_manager', 'incident_coordinator'], 'incidents:delete': ['admin'],
+      'solutions:read': ['admin', 'risk_manager', 'auditor', 'dxeit_rep'],
+      'solutions:create': ['admin', 'risk_manager'], 'solutions:update': ['admin', 'risk_manager'], 'solutions:delete': ['admin'],
+      'requirements:read': ['admin', 'risk_manager', 'auditor', 'dxeit_rep'],
+      'requirements:create': ['admin', 'risk_manager'], 'requirements:update': ['admin', 'risk_manager'], 'requirements:delete': ['admin'],
+      'thresholds:read': ['admin', 'risk_manager', 'auditor', 'dxeit_rep'],
+      'thresholds:create': ['admin', 'risk_manager'], 'thresholds:update': ['admin', 'risk_manager'], 'thresholds:delete': ['admin'],
+      'consequences:read': ['admin', 'risk_manager', 'auditor', 'dxeit_rep'],
+      'consequences:create': ['admin', 'risk_manager'], 'consequences:update': ['admin', 'risk_manager'], 'consequences:delete': ['admin'],
+      'reconciliations:read': ['admin', 'risk_manager', 'auditor'], 'reconciliations:create': ['admin'], 'reconciliations:update': ['admin'],
+      'audit:read': ['admin', 'auditor'],
+      'dashboard:read': ['admin', 'risk_manager', 'asset_owner', 'incident_coordinator', 'auditor', 'dxeit_rep'],
+      'users:read': ['admin'], 'users:create': ['admin'], 'users:update': ['admin'], 'users:delete': ['admin'],
+      'roles:read': ['admin'], 'roles:create': ['admin'], 'roles:update': ['admin'], 'roles:delete': ['admin'],
+    };
+
+    const matrix = modules.map(mod => ({
+      module: mod.label, key: mod.key,
+      permissions: roles.map(role => ({
+        role,
+        read: pMap[`${mod.key}:read`]?.includes(role) ?? false,
+        create: pMap[`${mod.key}:create`]?.includes(role) ?? false,
+        update: pMap[`${mod.key}:update`]?.includes(role) ?? false,
+        delete: pMap[`${mod.key}:delete`]?.includes(role) ?? false,
+      })),
+    }));
+
+    res.json({ roles, modules, actions, matrix });
+  }
+);

@@ -1,7 +1,7 @@
 import { createCrudRouter } from '../utils/crudFactory';
 
 export const consequenceRouter = createCrudRouter({
-  table: 'consequences',
+  table: 'rr_core.consequences',
   entityType: 'fəsad',
   permissionPrefix: 'consequences',
   searchColumns: ['consequence_description'],

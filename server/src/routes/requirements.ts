@@ -3,7 +3,7 @@ import { generateCode } from '../utils/codeGenerator';
 import db from '../config/database';
 
 export const requirementRouter = createCrudRouter({
-  table: 'requirements',
+  table: 'rr_central.requirements',
   entityType: 'tələb',
   permissionPrefix: 'requirements',
   searchColumns: ['req_title', 'req_description', 'source_ref'],

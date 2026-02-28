@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Form, Input, Select, DatePicker, Switch, message } from 'antd';
+import { Modal, Form, Input, Select, DatePicker, Switch, Steps, Tag, message } from 'antd';
 import dayjs from 'dayjs';
 import api from '../../services/api';
 import { Incident } from '../../types';
@@ -11,6 +11,25 @@ interface IncidentFormProps {
   onSuccess: () => void;
   apiPath: string;
 }
+
+// Annex §6.1.5 — 13 ardıcıl mərhələ
+const PHASE_LABELS: Record<string, string> = {
+  detect: '1. Aşkarlama',
+  notify: '2. Bildiriş',
+  monitor: '3. Monitorinq',
+  assess: '4. Qiymətləndirmə',
+  block: '5. Bloklama',
+  restore: '6. Bərpa',
+  change: '7. Dəyişiklik idarəetmə',
+  update_info: '8. Məlumat yeniləmə',
+  improve: '9. Təkmilləşdirmə',
+  failover: '10. Ehtiyat keçid',
+  rollback: '11. Geri qaytarma',
+  evidence: '12. Sübut toplama',
+  anticrisis: '13. Anti-böhran',
+};
+
+const PHASE_ORDER = Object.keys(PHASE_LABELS);
 
 export default function IncidentForm({ visible, record, onClose, onSuccess, apiPath }: IncidentFormProps) {
   const [form] = Form.useForm();
@@ -81,6 +100,10 @@ export default function IncidentForm({ visible, record, onClose, onSuccess, apiP
     }
   };
 
+  // Current phase index for Steps indicator
+  const currentPhase = (record as any)?.response_phase || 'detect';
+  const currentPhaseIdx = PHASE_ORDER.indexOf(currentPhase);
+
   return (
     <Modal
       title={record ? 'İnsidenti redaktə et' : 'Yeni insident'}
@@ -88,10 +111,28 @@ export default function IncidentForm({ visible, record, onClose, onSuccess, apiP
       onCancel={onClose}
       onOk={handleSubmit}
       confirmLoading={loading}
-      width={760}
+      width={860}
       destroyOnClose
     >
       <Form form={form} layout="vertical">
+        {/* ── 13-Phase Progress Indicator (Annex §6.1.5) ── */}
+        {record && (
+          <div style={{ marginBottom: 24, overflowX: 'auto' }}>
+            <Tag color="blue" style={{ marginBottom: 8 }}>
+              Cari mərhələ: {PHASE_LABELS[currentPhase] || currentPhase}
+            </Tag>
+            <Steps
+              size="small"
+              current={currentPhaseIdx >= 0 ? currentPhaseIdx : 0}
+              items={PHASE_ORDER.map((key) => ({
+                title: PHASE_LABELS[key],
+              }))}
+              direction="vertical"
+              style={{ maxHeight: 260, overflowY: 'auto' }}
+            />
+          </div>
+        )}
+
         <Form.Item name="title" label="Başlıq" rules={[{ required: true }]}>
           <Input />
         </Form.Item>

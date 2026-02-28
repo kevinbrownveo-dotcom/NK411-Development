@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Form, Input, Select, InputNumber, message } from 'antd';
+import { Modal, Form, Input, Select, InputNumber, Switch, DatePicker, Divider, message } from 'antd';
 import api from '../../services/api';
 import { Threat } from '../../types';
 import FieldLabelWithHelp from '../../components/common/FieldLabelWithHelp';
@@ -43,6 +43,10 @@ export default function ThreatForm({ visible, record, onClose, onSuccess, apiPat
         severity_law: 'orta',
         probability_band_law: 'p41_60',
         purpose: [],
+        national_is_threat: false,
+        cia_property_threat: false,
+        is_potential_incident: false,
+        threat_status: 'aktiv',
       });
     }
   }, [visible, record, form]);
@@ -55,6 +59,7 @@ export default function ThreatForm({ visible, record, onClose, onSuccess, apiPat
       const payload = {
         ...values,
         violated_activity_area: values.violated_activity_area || null,
+        last_review_date: values.last_review_date ? values.last_review_date.format('YYYY-MM-DD') : null,
       };
 
       if (record) {
@@ -110,7 +115,7 @@ export default function ThreatForm({ visible, record, onClose, onSuccess, apiPat
           <Select mode="tags" tokenSeparators={[',']} />
         </Form.Item>
 
-        <Form.Item name="target_type" label={<FieldLabelWithHelp fieldKey="threats.target_type" label="Hədəf tipi" required />} rules={[{ required: true }]}> 
+        <Form.Item name="target_type" label={<FieldLabelWithHelp fieldKey="threats.target_type" label="Hədəf tipi" required />} rules={[{ required: true }]}>
           <Select options={[
             { value: 'struktur', label: 'struktur' },
             { value: 'infrastruktur_komponenti', label: 'infrastruktur_komponenti' },
@@ -120,7 +125,7 @@ export default function ThreatForm({ visible, record, onClose, onSuccess, apiPat
           ]} />
         </Form.Item>
 
-        <Form.Item name="intentionality" label={<FieldLabelWithHelp fieldKey="threats.intentionality" label="Niyyət" required />} rules={[{ required: true }]}> 
+        <Form.Item name="intentionality" label={<FieldLabelWithHelp fieldKey="threats.intentionality" label="Niyyət" required />} rules={[{ required: true }]}>
           <Select options={[
             { value: 'qərəzli', label: 'qərəzli' },
             { value: 'təsadüfi', label: 'təsadüfi' },
@@ -128,7 +133,7 @@ export default function ThreatForm({ visible, record, onClose, onSuccess, apiPat
           ]} />
         </Form.Item>
 
-        <Form.Item name="severity" label={<FieldLabelWithHelp fieldKey="threats.severity" label="Ciddilik" required />} rules={[{ required: true }]}> 
+        <Form.Item name="severity" label={<FieldLabelWithHelp fieldKey="threats.severity" label="Ciddilik" required />} rules={[{ required: true }]}>
           <Select options={[
             { value: 'çox_aşağı', label: 'çox_aşağı' },
             { value: 'aşağı', label: 'aşağı' },
@@ -138,11 +143,11 @@ export default function ThreatForm({ visible, record, onClose, onSuccess, apiPat
           ]} />
         </Form.Item>
 
-        <Form.Item name="probability" label="Ehtimal (0-100)" rules={[{ required: true }]}> 
+        <Form.Item name="probability" label="Ehtimal (0-100)" rules={[{ required: true }]}>
           <InputNumber min={0} max={100} style={{ width: '100%' }} />
         </Form.Item>
 
-        <Form.Item name="severity_law" label="Qanun ciddiliyi" rules={[{ required: true }]}> 
+        <Form.Item name="severity_law" label="Qanun ciddiliyi" rules={[{ required: true }]}>
           <Select options={[
             { value: 'çox_aşağı', label: 'çox_aşağı' },
             { value: 'aşağı', label: 'aşağı' },
@@ -152,7 +157,7 @@ export default function ThreatForm({ visible, record, onClose, onSuccess, apiPat
           ]} />
         </Form.Item>
 
-        <Form.Item name="probability_band_law" label={<FieldLabelWithHelp fieldKey="threats.probability_band_law" label="Probability band" required />} rules={[{ required: true }]}> 
+        <Form.Item name="probability_band_law" label={<FieldLabelWithHelp fieldKey="threats.probability_band_law" label="Probability band" required />} rules={[{ required: true }]}>
           <Select options={[
             { value: 'p01_20', label: 'p01_20' },
             { value: 'p21_40', label: 'p21_40' },
@@ -168,6 +173,41 @@ export default function ThreatForm({ visible, record, onClose, onSuccess, apiPat
 
         <Form.Item name="realization_tech" label={<FieldLabelWithHelp fieldKey="threats.realization_tech" label="Reallaşma texnikası" />}>
           <Input.TextArea rows={3} />
+        </Form.Item>
+
+        {/* ── Annex §3 Compliance fields ── */}
+        <Divider orientation="left">Əlavə §3 — Uyğunluq sahələri</Divider>
+
+        <Form.Item name="description" label="Təfsilatlı təsvir">
+          <Input.TextArea rows={3} />
+        </Form.Item>
+
+        <Form.Item name="national_is_threat" label="Milli İS təhdidi" valuePropName="checked">
+          <Switch checkedChildren="Bəli" unCheckedChildren="Xeyr" />
+        </Form.Item>
+
+        <Form.Item name="cia_property_threat" label="CIA mülkiyyət təhdidi" valuePropName="checked">
+          <Switch checkedChildren="Bəli" unCheckedChildren="Xeyr" />
+        </Form.Item>
+
+        <Form.Item name="is_potential_incident" label="IS hadisə potensialı" valuePropName="checked">
+          <Switch checkedChildren="Bəli" unCheckedChildren="Xeyr" />
+        </Form.Item>
+
+        <Form.Item name="sensitivity_level" label="Həssaslıq dərəcəsi (1-5)">
+          <InputNumber min={1} max={5} style={{ width: '100%' }} />
+        </Form.Item>
+
+        <Form.Item name="last_review_date" label="Son nəzərdən keçmə">
+          <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" />
+        </Form.Item>
+
+        <Form.Item name="threat_status" label="Təhdid statusu">
+          <Select options={[
+            { value: 'aktiv', label: 'Aktiv' },
+            { value: 'passiv', label: 'Passiv' },
+            { value: 'arxivləşdirilmiş', label: 'Arxivləşdirilmiş' },
+          ]} />
         </Form.Item>
       </Form>
     </Modal>

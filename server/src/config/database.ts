@@ -13,6 +13,8 @@ const config: Knex.Config = {
     user: process.env.DB_USER || 'postgres',
     password: process.env.DB_PASSWORD || 'postgres',
   },
+  // Qanun Maddə 5.2: 4-komponentli DB + system schema
+  searchPath: ['rr_core', 'rr_local', 'rr_central', 'rr_inventory', 'rr_system', 'public'],
   pool: {
     min: 2,
     max: 10,

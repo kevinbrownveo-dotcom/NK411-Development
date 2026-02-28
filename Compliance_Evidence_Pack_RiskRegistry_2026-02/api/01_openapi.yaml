@@ -1,0 +1,38 @@
+openapi: 3.0.0
+info:
+  title: Risk Registry API (Evidence Auto-Gen)
+  version: 1.0.0
+paths:
+  /api/risks:
+    post:
+      summary: Create a new risk
+      responses:
+        '201':
+          description: Created
+    get:
+      summary: List risks (DLP Masking Enabled)
+      responses:
+        '200':
+          description: OK
+  /api/risks/{id}/approve:
+    put:
+      summary: Approve risk (SoD Enforced)
+      responses:
+        '200':
+          description: Approved
+        '403':
+          description: Forbidden (Creator cannot approve)
+  /api/incidents/{id}/phase:
+    put:
+      summary: Advance incident phase (Sequential Workflow Enforced)
+      responses:
+        '200':
+          description: Phase advanced
+        '400':
+          description: Bad Request (Invalid sequence)
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

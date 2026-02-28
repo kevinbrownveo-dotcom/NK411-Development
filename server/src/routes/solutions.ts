@@ -2,7 +2,7 @@ import { createCrudRouter } from '../utils/crudFactory';
 import { generateCode } from '../utils/codeGenerator';
 
 export const solutionRouter = createCrudRouter({
-  table: 'solutions',
+  table: 'rr_inventory.solutions',
   entityType: 'həll',
   permissionPrefix: 'solutions',
   searchColumns: ['name', 'description', 'playbook'],

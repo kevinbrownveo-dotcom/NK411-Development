@@ -18,7 +18,9 @@ import { auditLogRouter } from './routes/auditLog';
 import { dashboardRouter } from './routes/dashboard';
 import { consequenceRouter } from './routes/consequences';
 import { adminRouter } from './routes/admin';
+import { siemRouter } from './routes/siem';
 import { logger } from './utils/logger';
+import { correlationMiddleware } from './middleware/correlationId';
 
 dotenv.config();
 
@@ -37,6 +39,9 @@ const PORT = process.env.PORT || 3001;
 // nginx reverse proxy arxasında işlədiyindən trust proxy aktiv et
 // (express-rate-limit X-Forwarded-For başlığını düzgün oxumaq üçün)
 app.set('trust proxy', 1);
+
+// ── Correlation ID — hər sorğuya unikal ID (Faza 15 §5) ──
+app.use(correlationMiddleware);
 
 // Security middleware
 app.use(helmet());
@@ -73,6 +78,7 @@ app.use('/api/consequences', consequenceRouter);
 app.use('/api/audit-log', auditLogRouter);
 app.use('/api/dashboard', dashboardRouter);
 app.use('/api/admin', adminRouter);
+app.use('/api/siem', siemRouter);
 
 // Health check
 app.get('/api/health', (_req, res) => {

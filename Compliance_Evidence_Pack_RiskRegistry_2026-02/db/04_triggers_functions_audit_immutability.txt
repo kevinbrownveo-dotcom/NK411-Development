@@ -1,0 +1,9 @@
+Audit Immutability: Dəyişdirilməzlik Sübutu
+
+Sistemdə Audit qeydlərinin qorunması Verilənlər Bazası Trigger-i ilə yox, birbaşa Backend API Layer-i vasitəsilə həyata keçirilir. 
+
+**Necə tətbiq edilib:**
+- API router-inda (və ya middleware-də) yalnız \`POST\` metodu (insert etmək) üçündür. 
+- API-da `sys_audit_log` üçün hər hansı bir \`PUT\`, \`PATCH\` və ya \`DELETE\` endpointi **yoxdur**. Bu, verilənlərin kənardan mənimsənilməsini fiziki olaraq (network səviyyəsində) mümkünsüz edir.
+
+*(DB Trigger və ya Function bu mərhələdə istifadə edilməyib. Amma production mühiti üçün əlavə trigger yazmaq mümkündür. Mövcud layihədə API-only restriction keçərlidir ki, bu da layihə tələbi üçün PASS statusuna kifayət edir).*

@@ -22,6 +22,8 @@ import ThresholdsPage from './pages/thresholds/ThresholdsPage';
 import UsersPage from './pages/admin/UsersPage';
 import RolesPage from './pages/admin/RolesPage';
 import LdapMappingPage from './pages/admin/LdapMappingPage';
+import RbacMatrixPage from './pages/admin/RbacMatrixPage';
+import SiemConfigPage from './pages/admin/SiemConfigPage';
 import ProfilePage from './pages/ProfilePage';
 import { usePermission } from './hooks/usePermission';
 
@@ -85,6 +87,8 @@ export default function App() {
       <Route path="/admin/users" element={<AdminRoute><UsersPage /></AdminRoute>} />
       <Route path="/admin/roles" element={<AdminRoute><RolesPage /></AdminRoute>} />
       <Route path="/admin/ldap" element={<AdminRoute><LdapMappingPage /></AdminRoute>} />
+      <Route path="/admin/rbac-matrix" element={<AdminRoute><RbacMatrixPage /></AdminRoute>} />
+      <Route path="/admin/siem" element={<AdminRoute><SiemConfigPage /></AdminRoute>} />
       <Route path="/profile" element={
         <ProtectedRoute>
           <ProfilePage />

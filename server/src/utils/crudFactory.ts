@@ -11,6 +11,10 @@ interface CrudOptions {
   codeColumn?: string;
   searchColumns?: string[];
   defaultSort?: string;
+  /** Columns to mask (replace with '***') for non-admin users (DLP — RR-REQ-0035) */
+  sensitiveColumns?: string[];
+  /** Max rows for non-admin users (DLP export limit — RR-REQ-0035). Default: 50 */
+  dlpMaxLimit?: number;
   beforeCreate?: (data: any, req: AuthRequest) => Promise<any>;
   afterCreate?: (record: any, req: AuthRequest) => Promise<void>;
   beforeUpdate?: (data: any, existing: any, req: AuthRequest) => Promise<any>;
@@ -27,8 +31,12 @@ export function createCrudRouter(options: CrudOptions): Router {
   router.get('/', authenticate, authorize(`${permissionPrefix}:read`),
     async (req: AuthRequest, res: Response) => {
       try {
+        const isAdmin = req.user?.role === 'admin';
+        const dlpLimit = options.dlpMaxLimit || 50;
+        const maxAllowed = isAdmin ? 100 : dlpLimit;
+
         const page = parseInt(req.query.page as string) || 1;
-        const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
+        const limit = Math.min(parseInt(req.query.limit as string) || 20, maxAllowed);
         const offset = (page - 1) * limit;
         const search = req.query.search as string;
         const sortBy = (req.query.sortBy as string) || defaultSort;
@@ -60,7 +68,20 @@ export function createCrudRouter(options: CrudOptions): Router {
         }
 
         const [{ count }] = await countQuery.count();
-        const data = await query.orderBy(sortBy, sortOrder).limit(limit).offset(offset);
+        let data = await query.orderBy(sortBy, sortOrder).limit(limit).offset(offset);
+
+        // DLP maskalama: admin olmayan istifadəçilər üçün həssas sahələri gizlət (RR-REQ-0035)
+        if (!isAdmin && options.sensitiveColumns && options.sensitiveColumns.length > 0) {
+          data = data.map((row: any) => {
+            const masked = { ...row };
+            for (const col of options.sensitiveColumns!) {
+              if (masked[col] !== undefined && masked[col] !== null) {
+                masked[col] = '***';
+              }
+            }
+            return masked;
+          });
+        }
 
         res.json({
           data,

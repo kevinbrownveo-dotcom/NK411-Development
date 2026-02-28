@@ -12,14 +12,14 @@ import {
 import { authorize } from '../middleware/rbac';
 import { writeAuditLog } from '../middleware/auditLog';
 import { validatePassword } from '../utils/passwordPolicy';
-import { logger } from '../utils/logger';
+import { logger, logSecurityEvent } from '../utils/logger';
 import { ldapService } from '../services/ldap';
 import { mailService } from '../utils/mailer';
 
 export const authRouter = Router();
 
 const MAX_LOGIN_ATTEMPTS = 5;
-const LOCK_DURATION_MS = 15 * 60 * 1000; // 15 dəqiqə
+const LOCKOUT_DURATIONS = [15 * 60 * 1000, 60 * 60 * 1000, 24 * 60 * 60 * 1000]; // 15min, 1h, 24h
 
 // Login üçün xüsusi rate limiter (hər 15 dəq 10 cəhd)
 const loginRateLimiter = rateLimit({
@@ -121,17 +121,51 @@ authRouter.post('/login', loginRateLimiter, async (req: Request, res: Response) 
 
     const validPassword = await bcrypt.compare(password, user.password_hash);
     if (!validPassword) {
-      const newAttempts = (user.login_attempts || 0) + 1;
-      const updates: Record<string, unknown> = { login_attempts: newAttempts };
-      if (newAttempts >= MAX_LOGIN_ATTEMPTS) {
-        updates.locked_until = new Date(Date.now() + LOCK_DURATION_MS);
-        logger.warn(`Hesab kilitləndi: ${email} (${newAttempts} uğursuz cəhd)`);
+      const newAttempts = (user.failed_login_count || user.login_attempts || 0) + 1;
+      const updates: Record<string, unknown> = {
+        failed_login_count: newAttempts,
+        login_attempts: newAttempts,
+        last_failed_login: new Date(),
+      };
 
-        // Asinxron olaraq bildiriş göndər
+      // Progressive lockout: 5→15min, 10→1h, 15→24h
+      if (newAttempts >= MAX_LOGIN_ATTEMPTS) {
+        const lockoutLevel = Math.min(Math.floor(newAttempts / MAX_LOGIN_ATTEMPTS) - 1, 2);
+        const lockDuration = LOCKOUT_DURATIONS[lockoutLevel];
+        updates.locked_until = new Date(Date.now() + lockDuration);
+        updates.lockout_level = lockoutLevel + 1;
+        logger.warn(`Hesab kilitləndi: ${email} (level ${lockoutLevel + 1}, ${lockDuration / 60000} dəq)`);
+
+        logSecurityEvent({
+          event_type: 'LOGIN_LOCKOUT',
+          user_id: user.id,
+          role_snapshot: user.role,
+          source_ip: (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || undefined,
+          user_agent: req.headers['user-agent'] || undefined,
+          result: 'DENY',
+          reason_code: `LOCKOUT_LEVEL_${lockoutLevel + 1}`,
+          severity: 'WARN',
+          metadata: { attempts: newAttempts, lock_minutes: lockDuration / 60000 },
+        }).catch(() => { });
+
         const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'Məlum deyil';
-        const lockMinutes = LOCK_DURATION_MS / 60000;
+        const lockMinutes = lockDuration / 60000;
         mailService.sendAccountLockNotification(user.email, Array.isArray(ip) ? ip[0] : ip, lockMinutes).catch(() => { });
       }
+
+      // LOGIN_FAIL event
+      logSecurityEvent({
+        event_type: 'LOGIN_FAIL',
+        user_id: user.id,
+        role_snapshot: user.role,
+        source_ip: (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || undefined,
+        user_agent: req.headers['user-agent'] || undefined,
+        result: 'FAIL',
+        reason_code: 'INVALID_PASSWORD',
+        severity: 'WARN',
+        metadata: { attempts: newAttempts },
+      }).catch(() => { });
+
       await db('users').where({ id: user.id }).update(updates);
       res.status(401).json({ error: 'Yanlış email və ya şifrə' });
       return;
@@ -147,8 +181,21 @@ authRouter.post('/login', loginRateLimiter, async (req: Request, res: Response) 
       refresh_token: refreshHash,
       last_login: new Date(),
       login_attempts: 0,
+      failed_login_count: 0,
       locked_until: null,
+      lockout_level: 0,
     });
+
+    // LOGIN_SUCCESS event
+    logSecurityEvent({
+      event_type: 'LOGIN_SUCCESS',
+      user_id: user.id,
+      role_snapshot: user.role,
+      source_ip: (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || undefined,
+      user_agent: req.headers['user-agent'] || undefined,
+      result: 'SUCCESS',
+      severity: 'INFO',
+    }).catch(() => { });
 
     res.json({
       accessToken, refreshToken,

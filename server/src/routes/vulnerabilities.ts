@@ -12,7 +12,7 @@ const SEVERITY_LAW_MAP: Record<string, string> = {
 };
 
 export const vulnerabilityRouter = createCrudRouter({
-  table: 'vulnerabilities',
+  table: 'rr_central.vulnerabilities',
   entityType: 'boşluq',
   permissionPrefix: 'vulnerabilities',
   searchColumns: ['name', 'cve_ref'],

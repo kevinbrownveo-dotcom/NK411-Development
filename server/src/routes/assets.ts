@@ -6,7 +6,7 @@ import db from '../config/database';
 import { Response } from 'express';
 
 export const assetRouter = createCrudRouter({
-  table: 'assets',
+  table: 'rr_local.assets',
   entityType: 'aktiv',
   permissionPrefix: 'assets',
   codeColumn: 'asset_code',
