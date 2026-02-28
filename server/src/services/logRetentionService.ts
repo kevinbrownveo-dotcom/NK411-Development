@@ -15,6 +15,14 @@ const IMMUTABLE_TABLES: Record<string, string> = {
     'security_event_log': 'trg_security_event_immutable',
 };
 
+// WHITELIST of allowed tables for retention cleanup to prevent SQL injection
+const ALLOWED_LOG_TABLES = [
+    'audit_log',
+    'security_event_log',
+    'application_log',
+    'integration_log'
+];
+
 export async function runLogRetentionCleanup(): Promise<void> {
     logger.info('Starting Log Retention Cleanup job...');
     try {
@@ -22,6 +30,12 @@ export async function runLogRetentionCleanup(): Promise<void> {
 
         for (const policy of policies) {
             const { log_table, retention_days } = policy;
+
+            // SQL Injection protection: validate table name against whitelist
+            if (!ALLOWED_LOG_TABLES.includes(log_table)) {
+                logger.error(`Security Alert: Unauthorized log table in retention policy: ${log_table}`);
+                continue;
+            }
 
             // Calculate cutoff date (current date - retention_days)
             const cutoffDate = new Date();

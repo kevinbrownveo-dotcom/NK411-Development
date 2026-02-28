@@ -46,6 +46,23 @@ function calculateRiskScores(data: any) {
   };
 }
 
+/**
+ * Maliyyə riski (ALE) hesablanması
+ */
+function calculateFinancialRisk(data: any) {
+  const av = parseFloat(data.asset_monetary_value) || 0;
+  const ef = parseFloat(data.exposure_factor) || 0;
+  const aro = parseFloat(data.annualized_rate_of_occurrence) || 0;
+
+  const sle = av * ef;
+  const ale = sle * aro;
+
+  return {
+    single_loss_expectancy: sle,
+    annualized_loss_expectancy: ale,
+  };
+}
+
 export const riskRouter = createCrudRouter({
   table: 'rr_core.risks',
   entityType: 'risk',
@@ -59,6 +76,21 @@ export const riskRouter = createCrudRouter({
     const scores = calculateRiskScores(data);
     return { ...data, ...scores };
   },
+  afterCreate: async (record, req) => {
+    // Əgər maliyyə datası gəlibsə, alt cədvələ yaz
+    if (req.body.financial_assessment) {
+      const finData = calculateFinancialRisk(req.body.financial_assessment);
+      await db('rr_core.financial_risk_details').insert({
+        risk_id: record.id,
+        ...req.body.financial_assessment,
+        ...finData
+      });
+      await db('rr_core.risks').where({ id: record.id }).update({
+        has_financial_assessment: true,
+        total_ale_value: finData.annualized_loss_expectancy
+      });
+    }
+  },
   beforeUpdate: async (data, existing) => {
     // Yenidən hesabla əgər inputlar dəyişibsə
     const merged = { ...existing, ...data };
@@ -66,6 +98,53 @@ export const riskRouter = createCrudRouter({
     return { ...data, ...scores };
   },
 });
+
+// ── Maliyyə Riski Detalları ──────────────────────────────────
+riskRouter.get('/:id/financial', authenticate, authorize('risks:read'),
+  async (req: AuthRequest, res: Response) => {
+    try {
+      const details = await db('rr_core.financial_risk_details')
+        .where({ risk_id: req.params.id })
+        .first();
+      res.json(details || null);
+    } catch (error) {
+      res.status(500).json({ error: 'Maliyyə detalları alınarkən xəta' });
+    }
+  }
+);
+
+riskRouter.post('/:id/financial', authenticate, authorize('risks:update'),
+  async (req: AuthRequest, res: Response) => {
+    try {
+      const finData = calculateFinancialRisk(req.body);
+
+      const existing = await db('rr_core.financial_risk_details')
+        .where({ risk_id: req.params.id })
+        .first();
+
+      if (existing) {
+        await db('rr_core.financial_risk_details')
+          .where({ risk_id: req.params.id })
+          .update({ ...req.body, ...finData, updated_at: new Date() });
+      } else {
+        await db('rr_core.financial_risk_details').insert({
+          risk_id: req.params.id,
+          ...req.body,
+          ...finData
+        });
+      }
+
+      await db('rr_core.risks').where({ id: req.params.id }).update({
+        has_financial_assessment: true,
+        total_ale_value: finData.annualized_loss_expectancy
+      });
+
+      res.json({ success: true, ...finData });
+    } catch (error) {
+      res.status(500).json({ error: 'Maliyyə qiymətləndirilməsi saxlanılarkən xəta' });
+    }
+  }
+);
 
 // GET /api/risks/:id/score — Real vaxtda risk skoru hesabla
 riskRouter.get('/:id/score', authenticate, authorize('risks:read'),

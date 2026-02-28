@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Form, Input, Select, InputNumber, message } from 'antd';
+import { Modal, Form, Input, Select, InputNumber, message, Switch, Divider, Typography } from 'antd';
 import api from '../../services/api';
 import { Risk } from '../../types';
 
@@ -14,12 +14,25 @@ interface RiskFormProps {
 export default function RiskForm({ visible, record, onClose, onSuccess, apiPath }: RiskFormProps) {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [showFinancial, setShowFinancial] = useState(false);
 
   useEffect(() => {
     if (!visible) return;
 
     if (record) {
       form.setFieldsValue(record);
+      if (record.has_financial_assessment) {
+        setShowFinancial(true);
+        api.get(`${apiPath}/${record.id}/financial`).then(res => {
+          if (res.data) {
+            form.setFieldsValue({
+              financial: res.data
+            });
+          }
+        }).catch(() => {});
+      } else {
+        setShowFinancial(false);
+      }
     } else {
       form.resetFields();
       form.setFieldsValue({
@@ -50,10 +63,19 @@ export default function RiskForm({ visible, record, onClose, onSuccess, apiPath 
       };
 
       if (record) {
-        await api.put(`${apiPath}/${record.id}`, payload);
+        await api.put(`${apiPath}/${record.id}`, { ...payload, has_financial_assessment: showFinancial });
+        if (showFinancial) {
+          const finValues = form.getFieldValue('financial');
+          await api.post(`${apiPath}/${record.id}/financial`, finValues);
+        }
         message.success('Risk yeniləndi');
       } else {
-        await api.post(apiPath, payload);
+        const createPayload = {
+          ...payload,
+          has_financial_assessment: showFinancial,
+          financial_assessment: showFinancial ? values.financial : null
+        };
+        await api.post(apiPath, createPayload);
         message.success('Risk yaradıldı');
       }
       onSuccess();
@@ -145,6 +167,37 @@ export default function RiskForm({ visible, record, onClose, onSuccess, apiPath 
             { value: 'bağlı', label: 'bağlı' },
           ]} />
         </Form.Item>
+
+        <Divider orientation="left">Maliyyə Riski (Financial Exposure)</Divider>
+        <Form.Item label="Maliyyə qiymətləndirilməsini aktivləşdir">
+          <Switch checked={showFinancial} onChange={setShowFinancial} />
+        </Form.Item>
+
+        {showFinancial && (
+          <div style={{ background: '#fafafa', padding: '16px', borderRadius: '8px', border: '1px solid #f0f0f0' }}>
+            <Typography.Text type="secondary" style={{ display: 'block', marginBottom: '16px' }}>
+              NK-411 Qanun §4.2.3.5 üzrə kəmiyyət analizi
+            </Typography.Text>
+
+            <Form.Item name={['financial', 'asset_monetary_value']} label="Aktivin Maliyyə Dəyəri (AV - AZN)" rules={[{ required: showFinancial }]}>
+              <InputNumber min={0} formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} style={{ width: '100%' }} />
+            </Form.Item>
+
+            <Form.Item name={['financial', 'exposure_factor']} label="Təsir Faktoru (EF - %)" tooltip="Təhdid baş verdikdə aktivin itirilən dəyər faizi">
+              <InputNumber min={0} max={1} step={0.01} style={{ width: '100%' }} placeholder="Məsələn: 0.1 (10%)" />
+            </Form.Item>
+
+            <Form.Item name={['financial', 'annualized_rate_of_occurrence']} label="İllik Başvermə Tezliyi (ARO)" tooltip="İldə neçə dəfə baş verməsi gözlənilir">
+              <InputNumber min={0} step={0.1} style={{ width: '100%' }} />
+            </Form.Item>
+
+            {record && record.total_ale_value && (
+              <div style={{ marginTop: '10px', fontWeight: 'bold' }}>
+                Cari İllik Maliyyə Riski (ALE): {Number(record.total_ale_value).toLocaleString()} AZN
+              </div>
+            )}
+          </div>
+        )}
       </Form>
     </Modal>
   );
