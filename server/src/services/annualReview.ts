@@ -1,7 +1,7 @@
 import cron from 'node-cron';
-import db from '../config/db';
-import { mailService } from './mailService';
-import logger from '../utils/logger';
+import db from '../config/database';
+import { mailService } from '../utils/mailer';
+import { logger } from '../utils/logger';
 
 export class AnnualReviewService {
     /**
@@ -54,9 +54,10 @@ export class AnnualReviewService {
 
                 const assetListStr = assets.map(a => `- ${a.asset_code}: ${a.name} (Son yoxlanış: ${new Date(a.last_review).toLocaleDateString()})`).join('\n');
 
-                await mailService.sendSystemAlert(
-                    'İllik Aktiv Təftişi Tələbi (Qanun NK-411 §10.3)',
-                    `Hörmətli ${owner.full_name},
+                await mailService.sendMail({
+                    to: owner.email,
+                    subject: 'İllik Aktiv Təftişi Tələbi (Qanun NK-411 §10.3)',
+                    text: `Hörmətli ${owner.full_name},
           
 Sahibi olduğunuz aşağıdakı aktivlərin son təftişindən 1 ildən çox vaxt keçmişdir. Zəhmət olmasa sistemə daxil olub aktivləri yenidən qiymətləndirin və onlara dair qeydlərinizi yeniləyin (Review statusunu güncəlləyin).
 
@@ -64,7 +65,7 @@ Aktivlər siyahısı:
 ${assetListStr}
           
 Qeyd: Bu, NK-411 uyğunluq avtomatik bildirişidir.`
-                );
+                });
             } catch (err) {
                 logger.error(`Failed to send annual review email to owner ${ownerId}`, err);
             }
@@ -102,9 +103,10 @@ Qeyd: Bu, NK-411 uyğunluq avtomatik bildirişidir.`
 
                 const riskListStr = risks.map(r => `- ${r.risk_code}: ${r.name} (Son yenilənmə: ${new Date(r.updated_at).toLocaleDateString()})`).join('\n');
 
-                await mailService.sendSystemAlert(
-                    'İllik Risk Təftişi Tələbi (Qanun NK-411 §10.3)',
-                    `Hörmətli ${owner.full_name},
+                await mailService.sendMail({
+                    to: owner.email,
+                    subject: 'İllik Risk Təftişi Tələbi (Qanun NK-411 §10.3)',
+                    text: `Hörmətli ${owner.full_name},
           
 Sahibi olduğunuz aşağıdakı aktiv risklərin məlumatları 1 ildən çoxdur ki yenilənmir. Qanunvericiliyə əsasən, bu risklərin vəziyyəti mütləq illik olaraq yenidən nəzərdən keçirilməlidir.
 
@@ -112,7 +114,7 @@ Risklər siyahısı:
 ${riskListStr}
           
 Qeyd: Zəhmət olmasa sistemə daxil olaraq risk emalı planını nəzərdən keçirin.`
-                );
+                });
             } catch (err) {
                 logger.error(`Failed to send annual risk review email to owner ${ownerId}`, err);
             }
