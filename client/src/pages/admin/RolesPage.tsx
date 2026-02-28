@@ -10,6 +10,7 @@ import {
 import type { ColumnsType } from 'antd/es/table';
 import { adminApi } from '../../services/api';
 import type { Role, RolePermission } from '../../types';
+import GlobalRbacMatrix from './GlobalRbacMatrix';
 
 const { Title, Text } = Typography;
 
@@ -245,63 +246,66 @@ export default function RolesPage() {
   );
 
   return (
-    <Card>
-      <Space style={{ width: '100%', justifyContent: 'space-between', marginBottom: 16 }} wrap>
-        <Title level={4} style={{ margin: 0 }}>Rol & İcazə İdarəetməsi</Title>
-        <Space>
-          <Button icon={<ReloadOutlined />} onClick={load} />
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => { setMatrix(buildMatrix([])); form.resetFields(); setCreateOpen(true); }}>
-            Yeni Rol
-          </Button>
-        </Space>
-      </Space>
-
-      <Table rowKey="id" dataSource={roles} columns={columns} loading={loading} size="small" pagination={false} />
-
-      {/* İcazə Matrisi Modalı */}
-      <Modal
-        title={
+    <>
+      <Card>
+        <Space style={{ width: '100%', justifyContent: 'space-between', marginBottom: 16 }} wrap>
+          <Title level={4} style={{ margin: 0 }}>Rol & İcazə İdarəetməsi</Title>
           <Space>
-            <SettingOutlined />
-            <span>İcazə Matrisi: <Text type="secondary">{selectedRole?.label}</Text></span>
-            {selectedRole?.is_system && <Alert type="info" message="Sistem roleun icazələrini dəyişdirmək mümkündür, lakin diqqətlə edin." banner style={{ padding: '0 8px' }} />}
+            <Button icon={<ReloadOutlined />} onClick={load} />
+            <Button type="primary" icon={<PlusOutlined />} onClick={() => { setMatrix(buildMatrix([])); form.resetFields(); setCreateOpen(true); }}>
+              Yeni Rol
+            </Button>
           </Space>
-        }
-        open={permOpen}
-        onOk={handleSavePerms}
-        onCancel={() => setPermOpen(false)}
-        okText="Yadda saxla"
-        cancelText="Ləğv et"
-        width={780}
-        confirmLoading={permLoading}
-      >
-        <PermissionMatrix />
-      </Modal>
+        </Space>
 
-      {/* Yeni Rol Yaratma Modalı */}
-      <Modal
-        title="Yeni Rol Yarat"
-        open={createOpen}
-        onOk={handleCreateRole}
-        onCancel={() => setCreateOpen(false)}
-        okText="Yarat"
-        cancelText="Ləğv et"
-        width={780}
-      >
-        <Form form={form} layout="vertical">
-          <Form.Item name="name" label="Rol Kodu (daxili)" rules={[{ required: true, message: 'Rol kodu tələb olunur' }, { pattern: /^[a-z_]+$/, message: 'Yalnız kiçik hərf və alt xətt' }]}>
-            <Input placeholder="məs. finance_manager" />
-          </Form.Item>
-          <Form.Item name="label" label="Görünən Ad" rules={[{ required: true, message: 'Rol adı tələb olunur' }]}>
-            <Input placeholder="məs. Maliyyə Meneceri" />
-          </Form.Item>
-          <Form.Item name="description" label="Təsvir">
-            <Input.TextArea rows={2} />
-          </Form.Item>
-        </Form>
-        <Divider>İcazə Matrisi</Divider>
-        <PermissionMatrix />
-      </Modal>
-    </Card>
+        <Table rowKey="id" dataSource={roles} columns={columns} loading={loading} size="small" pagination={false} />
+
+        {/* İcazə Matrisi Modalı */}
+        <Modal
+          title={
+            <Space>
+              <SettingOutlined />
+              <span>İcazə Matrisi: <Text type="secondary">{selectedRole?.label}</Text></span>
+              {selectedRole?.is_system && <Alert type="info" message="Sistem roleun icazələrini dəyişdirmək mümkündür, lakin diqqətlə edin." banner style={{ padding: '0 8px' }} />}
+            </Space>
+          }
+          open={permOpen}
+          onOk={handleSavePerms}
+          onCancel={() => setPermOpen(false)}
+          okText="Yadda saxla"
+          cancelText="Ləğv et"
+          width={780}
+          confirmLoading={permLoading}
+        >
+          <PermissionMatrix />
+        </Modal>
+
+        {/* Yeni Rol Yaratma Modalı */}
+        <Modal
+          title="Yeni Rol Yarat"
+          open={createOpen}
+          onOk={handleCreateRole}
+          onCancel={() => setCreateOpen(false)}
+          okText="Yarat"
+          cancelText="Ləğv et"
+          width={780}
+        >
+          <Form form={form} layout="vertical">
+            <Form.Item name="name" label="Rol Kodu (daxili)" rules={[{ required: true, message: 'Rol kodu tələb olunur' }, { pattern: /^[a-z_]+$/, message: 'Yalnız kiçik hərf və alt xətt' }]}>
+              <Input placeholder="məs. finance_manager" />
+            </Form.Item>
+            <Form.Item name="label" label="Görünən Ad" rules={[{ required: true, message: 'Rol adı tələb olunur' }]}>
+              <Input placeholder="məs. Maliyyə Meneceri" />
+            </Form.Item>
+            <Form.Item name="description" label="Təsvir">
+              <Input.TextArea rows={2} />
+            </Form.Item>
+          </Form>
+          <Divider>İcazə Matrisi</Divider>
+        </Modal>
+      </Card>
+
+      <GlobalRbacMatrix />
+    </>
   );
 }
