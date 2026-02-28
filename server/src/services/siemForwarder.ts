@@ -49,14 +49,31 @@ interface LogEntry {
 
 // ── Severity ordering ──────────────────────────────────
 const SEV_ORDER: Record<string, number> = {
-    DEBUG: 0, INFO: 1, WARN: 2, ERROR: 3, CRITICAL: 4,
+    DEBUG: 0, INFO: 1, WARN: 2, ERROR: 3, CRITICAL: 4, OFF: 99,
 };
 
 // ── Global state ──────────────────────────────────────
 let globalEnabled = true;
+let globalLogLevel: string = 'DEBUG'; // Minimum internal logging level (DB-yə yazılma)
 const queues = new Map<string, LogEntry[]>();
 const connections = new Map<string, net.Socket>();
 let destinations: SiemDest[] = [];
+
+// ── shouldLog: checks if event severity meets internal threshold ──
+export function shouldLog(severity: string): boolean {
+    const eventSev = SEV_ORDER[(severity || 'INFO').toUpperCase()] ?? 1;
+    const threshold = SEV_ORDER[globalLogLevel.toUpperCase()] ?? 0;
+    return eventSev >= threshold;
+}
+
+export function getLogLevel(): string {
+    return globalLogLevel;
+}
+
+export function setLogLevel(level: string): void {
+    globalLogLevel = level.toUpperCase();
+    logger.info(`Internal log level dəyişdi: ${globalLogLevel}`);
+}
 
 // ── Load destinations from DB ─────────────────────────
 async function loadDestinations(): Promise<void> {

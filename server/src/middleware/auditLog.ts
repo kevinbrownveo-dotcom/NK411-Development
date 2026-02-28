@@ -13,7 +13,7 @@ import { createHash } from 'crypto';
 import db from '../config/database';
 import { logger } from '../utils/logger';
 import { getCorrelationId, getRequestId, getLatencyMs } from './correlationId';
-import { forwardToSiem } from '../services/siemForwarder';
+import { forwardToSiem, shouldLog } from '../services/siemForwarder';
 
 type AuditAction = 'create' | 'update' | 'delete' | 'override' | 'resolve_conflict' | 'export' | 'sync' | 'login' | 'approve';
 
@@ -72,6 +72,9 @@ async function getPrevAuditHash(entityType: string, entityId: string): Promise<s
 // ── Main Write Function ──────────────────────────────────
 export async function writeAuditLog(entry: AuditEntry): Promise<void> {
   try {
+    // Global log level check — severity altındakılar yazılmır
+    if (!shouldLog(entry.severity || 'INFO')) return;
+
     const correlationId = getCorrelationId();
     const requestId = getRequestId();
     const latencyMs = getLatencyMs();

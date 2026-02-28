@@ -57,7 +57,9 @@ export default function SiemConfigPage() {
     const [modalVisible, setModalVisible] = useState(false);
     const [editingDest, setEditingDest] = useState<SiemDestination | null>(null);
     const [forwardingEnabled, setForwardingEnabled] = useState(true);
+    const [logLevel, setLogLevel] = useState('DEBUG');
     const [toggleLoading, setToggleLoading] = useState(false);
+    const [retentionLoading, setRetentionLoading] = useState(false);
     const [form] = Form.useForm();
 
     const loadAll = async () => {
@@ -73,6 +75,7 @@ export default function SiemConfigPage() {
             setRetention(retRes.data);
             setEvents(evRes.data);
             setForwardingEnabled(statusRes.data.enabled);
+            setLogLevel(statusRes.data.logLevel || 'DEBUG');
         } catch { /* ignore */ }
         setLoading(false);
     };
@@ -89,6 +92,27 @@ export default function SiemConfigPage() {
             message.error('Dəyişiklik uğursuz oldu');
         }
         setToggleLoading(false);
+    };
+
+    const handleChangeLogLevel = async (level: string) => {
+        try {
+            const res = await api.post('/siem/log-level', { level });
+            setLogLevel(res.data.logLevel);
+            message.success(`Log level dəyişdi: ${res.data.logLevel}`);
+        } catch {
+            message.error('Log level dəyişikliyi uğursuz oldu');
+        }
+    };
+
+    const handleRunRetention = async () => {
+        setRetentionLoading(true);
+        try {
+            const res = await api.post('/siem/retention/run');
+            message.success(res.data.message || 'Siyasətlər tətbiq edildi və köhnə loglar silindi.');
+        } catch {
+            message.error('Köhnə logların silinməsi zamanı xəta baş verdi. Verilənlər bazasını yoxlayın.');
+        }
+        setRetentionLoading(false);
     };
 
     const handleSaveDest = async (values: any) => {
@@ -159,13 +183,33 @@ export default function SiemConfigPage() {
                 </Title>
                 <Space size="large">
                     <div style={{
+                        display: 'flex', alignItems: 'center', gap: 10,
+                        padding: '8px 16px', borderRadius: 8,
+                        background: '#f0f5ff', border: '1px solid #adc6ff',
+                    }}>
+                        <Text strong>Log Level:</Text>
+                        <Select
+                            value={logLevel}
+                            onChange={handleChangeLogLevel}
+                            style={{ width: 150 }}
+                            options={[
+                                { value: 'OFF', label: '🚫 OFF — Tam söndür' },
+                                { value: 'DEBUG', label: '🔍 DEBUG — Hamısı' },
+                                { value: 'INFO', label: 'ℹ️ INFO — Normal+' },
+                                { value: 'WARN', label: '⚠️ WARN — Xəbərdarlıq+' },
+                                { value: 'ERROR', label: '❌ ERROR — Xəta+' },
+                                { value: 'CRITICAL', label: '🚨 CRITICAL' },
+                            ]}
+                        />
+                    </div>
+                    <div style={{
                         display: 'flex', alignItems: 'center', gap: 12,
                         padding: '8px 20px', borderRadius: 8,
                         background: forwardingEnabled ? '#f6ffed' : '#fff2f0',
                         border: `1px solid ${forwardingEnabled ? '#b7eb8f' : '#ffa39e'}`,
                     }}>
                         <PoweroffOutlined style={{ fontSize: 18, color: forwardingEnabled ? '#52c41a' : '#ff4d4f' }} />
-                        <Text strong>Log Göndərmə:</Text>
+                        <Text strong>SIEM Göndərmə:</Text>
                         <Switch
                             checked={forwardingEnabled}
                             onChange={handleToggleForwarding}
@@ -218,7 +262,20 @@ export default function SiemConfigPage() {
                 </TabPane>
 
                 <TabPane tab="Log Retention" key="2">
-                    <Alert message="Hər log cədvəli üçün saxlama müddəti və arxivləmə parametrlərini konfiqurasiya edin." type="info" showIcon style={{ marginBottom: 16 }} />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                        <Alert message="Hər log cədvəli üçün saxlama müddəti və arxivləmə parametrlərini konfiqurasiya edin." type="info" showIcon style={{ flex: 1, marginRight: 16 }} />
+                        <Popconfirm
+                            title="Təmizlənməni indi başlatmaq istəyirsiniz?"
+                            description="Göstərilən limitdən köhnə bütün loglar verilənlər bazasından GERİQAYTARILMAZ SİLİNƏCƏK. Əminsiniz?"
+                            onConfirm={handleRunRetention}
+                            okText="Bəli, Təmizlə"
+                            cancelText="Xeyr"
+                        >
+                            <Button type="primary" danger icon={<DeleteOutlined />} loading={retentionLoading}>
+                                İndi Təmizlə
+                            </Button>
+                        </Popconfirm>
+                    </div>
                     <Table dataSource={retention} rowKey="id" pagination={false} bordered size="small"
                         columns={[
                             {

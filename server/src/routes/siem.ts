@@ -12,7 +12,7 @@ import { authorize } from '../middleware/rbac';
 import { writeAuditLog, verifyAuditChain } from '../middleware/auditLog';
 import { logger } from '../utils/logger';
 import db from '../config/database';
-import { isForwardingEnabled, setForwardingEnabled, sendTestLog, reloadDestinations } from '../services/siemForwarder';
+import { isForwardingEnabled, setForwardingEnabled, sendTestLog, reloadDestinations, getLogLevel, setLogLevel } from '../services/siemForwarder';
 
 export const siemRouter = Router();
 
@@ -23,7 +23,7 @@ export const siemRouter = Router();
 /** GET /api/siem/forwarding-status */
 siemRouter.get('/forwarding-status', authenticate, authorize('users:read'),
     (_req: AuthRequest, res: Response) => {
-        res.json({ enabled: isForwardingEnabled() });
+        res.json({ enabled: isForwardingEnabled(), logLevel: getLogLevel() });
     }
 );
 
@@ -38,7 +38,28 @@ siemRouter.post('/forwarding-status', authenticate, authorize('users:update'),
             actor_user_id: req.user!.userId, actor_role: req.user!.role,
             ip_address: req.ip,
         });
-        res.json({ enabled: isForwardingEnabled() });
+        res.json({ enabled: isForwardingEnabled(), logLevel: getLogLevel() });
+    }
+);
+
+/** POST /api/siem/log-level — { level: 'DEBUG'|'INFO'|'WARN'|'ERROR'|'CRITICAL' } */
+siemRouter.post('/log-level', authenticate, authorize('users:update'),
+    async (req: AuthRequest, res: Response) => {
+        const { level } = req.body;
+        const validLevels = ['OFF', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'CRITICAL'];
+        if (!level || !validLevels.includes(level.toUpperCase())) {
+            res.status(400).json({ error: 'Düzgün level seçin: DEBUG, INFO, WARN, ERROR, CRITICAL' });
+            return;
+        }
+        const oldLevel = getLogLevel();
+        setLogLevel(level);
+        await writeAuditLog({
+            entity_type: 'siem_config', entity_id: 'log-level',
+            action: 'update', changed_fields: { old_level: oldLevel, new_level: level.toUpperCase() },
+            actor_user_id: req.user!.userId, actor_role: req.user!.role,
+            ip_address: req.ip, severity: 'WARN',
+        });
+        res.json({ logLevel: getLogLevel() });
     }
 );
 
@@ -188,6 +209,27 @@ siemRouter.put('/retention/:id', authenticate, authorize('users:update'),
             res.json(updated);
         } catch (error) {
             res.status(500).json({ error: 'Retention siyasəti yenilənərkən xəta' });
+        }
+    }
+);
+
+/** POST /api/siem/retention/run — Manual cleanup işə salır */
+siemRouter.post('/retention/run', authenticate, authorize('users:update'),
+    async (req: AuthRequest, res: Response) => {
+        try {
+            // Import dynamically to avoid circular dependency issues at the router level
+            const { runLogRetentionCleanup } = await import('../services/logRetentionService');
+            await runLogRetentionCleanup();
+            await writeAuditLog({
+                entity_type: 'siem_config', entity_id: 'retention-cleanup',
+                action: 'update', changed_fields: { action: 'manual_cleanup_triggered' },
+                actor_user_id: req.user!.userId, actor_role: req.user!.role,
+                ip_address: req.ip, severity: 'WARN'
+            });
+            res.json({ success: true, message: 'Verilənlər bazası köhnə loglardan təmizləndi.' });
+        } catch (err: any) {
+            logger.error('Manual log cleanup failed', err);
+            res.status(500).json({ error: 'Məlumat bazası təmizlənərkən xəta baş verdi' });
         }
     }
 );

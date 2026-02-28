@@ -21,6 +21,7 @@ import { adminRouter } from './routes/admin';
 import { siemRouter } from './routes/siem';
 import { logger } from './utils/logger';
 import { correlationMiddleware } from './middleware/correlationId';
+import { startLogRetentionJob } from './services/logRetentionService';
 
 dotenv.config();
 
@@ -93,6 +94,8 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
 
 app.listen(PORT, () => {
   logger.info(`Server ${PORT} portunda işləyir`);
+  // Start background jobs
+  startLogRetentionJob();
 });
 
 export default app;

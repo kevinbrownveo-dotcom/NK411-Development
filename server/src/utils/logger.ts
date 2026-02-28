@@ -11,7 +11,7 @@
 import winston from 'winston';
 import { getCorrelationId, getRequestId } from '../middleware/correlationId';
 import db from '../config/database';
-import { forwardToSiem } from '../services/siemForwarder';
+import { forwardToSiem, shouldLog } from '../services/siemForwarder';
 
 // ── Sensitive field scrubbing ──────────────────────────────
 const SENSITIVE_KEYS = /password|token|secret|authorization|cookie|api_key|private_key|client_key/i;
@@ -120,6 +120,9 @@ export interface SecurityEvent {
 
 export async function logSecurityEvent(event: SecurityEvent): Promise<void> {
   try {
+    // Global log level check
+    if (!shouldLog(event.severity || 'INFO')) return;
+
     const correlationId = getCorrelationId();
     const requestId = getRequestId();
 
