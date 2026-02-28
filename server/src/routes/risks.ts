@@ -25,9 +25,9 @@ function calculateRiskScores(data: any) {
   // Keyfiyyət: qualitative_score = asset_value × prob_max × impact_max
   const qualitativeScore = assetValue * probMax * impactMax;
 
-  // Kəmiyyət: quantitative_value = asset_value × freq_pct_max × impact_max
-  const freqPctMax = Math.max(statProb / 100, probFactor / 5);
-  const quantitativeValue = assetValue * freqPctMax * impactMax;
+  // Kəmiyyət: quantitative_value = asset_value × freq_value × impact_max (Faza 18)
+  const freqValue = statProb > 0 ? statProb : (probFactor * 20); // 0-100% arası rəqəm
+  const quantitativeValue = assetValue * freqValue * impactMax;
 
   // Prioritet: 0-4=Aşağı | 5-9=Orta | 10-14=Yüksək | 15-25=Kritik
   let priority: string;
