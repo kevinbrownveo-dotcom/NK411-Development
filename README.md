@@ -26,13 +26,15 @@ NK411, təşkilatların informasiya aktivlərini, təhdidlərini, zəifliklərin
 
 **Əsas xüsusiyyətlər:**
 
-- D3.js əsaslı interaktiv aktiv asılılıq xəritəsi
-- JWT + Refresh Token əsaslı təhlükəsiz autentifikasiya
-- Dinamik RBAC — admin tərəfindən idarə olunan xüsusi rollar və icazələr
-- LDAP / Active Directory hibrid inteqrasiyası
-- CSV import / export
-- Tam audit jurnalı
-- Azərbaycan dilində interfeys
+- 🛡 **NK-411, ISO 27001 və NIST CSF Uyğunluğu** — yerli və beynəlxalq qanunvericiliyə tam cavab verən memarlıq.
+- 📊 **Detallı Dashboard və Qanuni KPI-lar** — 10+ NK-411 məqsəd göstəriciləri panelinin interaktiv izlənməsi və SMART (OKR) hədəf vidjeti.
+- ⚙️ **Kəmiyyət və Keyfiyyət Riskləri** — `Dəyər × Tezlik × Təsir` riyazi formulu və matriks qiymətləndirməsi.
+- 🤖 **Avtomatlaşdırılmış Gözdən Keçirmə (Cron)** — müddəti 1 ili bitmiş Aktiv və Risklər üçün avtomatik e-poçt xəbərdarlıqları.
+- 🔐 **Çoxtərəfli Doğrulama (MFA/2FA)** — QR kod və Authenticator tətbiqləri ilə giriş, həmçinin Sistem Səviyyəli "Token Blacklisting" (Sessiya sonlandırma).
+- 🕸 **D3.js Qrafik Vizualizasiya** — aktivlər arası asılılıqların interaktiv topologiya xəritəsi.
+- 🔑 **Dinamic RBAC və Qlobal Matris** — Admin panelində bütün rolları və səlahiyyətləri tək ekranda birləşdirən "Qlobal RBAC İdarəetmə Matrisi".
+- 🏢 **Hibrid LDAP / Active Directory** — daxili AD qruplarının sistem rollarına avtomatik mappinqi.
+- 📜 **SIEM İnteqrasiyalı Audit** — bütün loqların (ürək döyüntüsü/heartbeat ilə birlikdə) tranzaksiya səviyyəsində izlənməsi.
 
 ---
 
@@ -269,15 +271,16 @@ POST            /api/admin/ldap/test
 
 | Tədbir | Detal |
 |--------|-------|
-| Şifrə hashing | bcrypt (rounds: 10) |
-| JWT | Access 15 dəq + Refresh 8 saat |
-| Refresh token | DB-də bcrypt-hash ilə saxlanır |
-| Login lockout | 5 uğursuz cəhd → 15 dəqiqə blok |
-| Rate limiting | Login: 10 cəhd / 15 dəqiqə |
-| Şifrə siyasəti | Min 8 xarakter, böyük/kiçik hərf, rəqəm, xüsusi simvol |
-| RBAC cache | 5 dəqiqəlik in-memory icazə keşi |
-| Trust proxy | Nginx `X-Forwarded-For` düzgün işlənir |
-| Register endpoint | Yalnız admin yarada bilər |
+| Şifrə Hashing | bcrypt (rounds: 12) |
+| Çoxtərəfli Doğrulama (MFA) | TOTP (Time-based One-Time Password) QR kod / Authenticator dəstəyi ilə |
+| Token İdarəetməsi | JWT (Access 15 dəq + Refresh 8 saat) və Ciddi Redis Qara Siyahısı (Blacklist) |
+| Sessiya İdarəetməsi | Aktiv sessiyaların real-vaxt (real-time) sıfırlanması və tək istifadəçili məhdudiyyətlər |
+| Şifrə Siyasəti | Min 8 xarakter, böyük/kiçik hərf, rəqəm, xüsusi simvol, keçmiş 3 şifrənin istifadəsinə qadağa |
+| Login Lockout | Ardıcıl 5 səhv cəhddən sonra 15 dəqiqəlik avtomatik bloklanma (Brute-force qoruması) |
+| Rate Limiting | Xüsusi API-lər (Login, MFA yoxlama) üçün dəqiqədə maks 10 sorğu |
+| RBAC Qlobal Matrisi | Bütün sistem resurslarına qranulyar (Create, Read, Update, Delete) nəzarət və `5 dəqiqəlik` in-memory keş |
+| Trust Proxy & X-Forwarded-For | Nginx tərəfindən idarə olunan IP bazlı audit və SIEM uyğun qeydiyyatlar |
+| Register Endpoint | Public qeydiyyat yoxdur (Yalnız Administrator yarada bilər) |
 
 ---
 
