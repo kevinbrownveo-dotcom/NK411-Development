@@ -66,9 +66,23 @@ export class LdapService {
     });
   }
 
+  /**
+   * Escape LDAP filter characters to prevent LDAP injection.
+   * Based on OWASP guidance for LDAP filter escaping.
+   */
+  private escapeFilter(input: string): string {
+    return input.replace(/\\/g, '\\5c')
+      .replace(/\*/g, '\\2a')
+      .replace(/\(/g, '\\28')
+      .replace(/\)/g, '\\29')
+      .replace(/\u0000/g, '\\00');
+  }
+
   /** İstifadəçini LDAP-da autentifikasiya et */
   async authenticate(username: string, password: string): Promise<LdapUser | null> {
     if (!this.enabled) return null;
+
+    const escapedUsername = this.escapeFilter(username);
 
     return new Promise((resolve) => {
       // Service account ilə bind et
@@ -89,7 +103,7 @@ export class LdapService {
         }
 
         // İstifadəçini e-mail ilə axtar
-        const searchFilter = `(${this.emailAttr}=${username})`;
+        const searchFilter = `(${this.emailAttr}=${escapedUsername})`;
         const searchOptions = {
           filter: searchFilter,
           scope: 'sub',
