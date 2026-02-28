@@ -7,12 +7,6 @@
 
 const API_BASE = 'http://localhost:3001/api';
 
-interface LoginResponse {
-    accessToken: string;
-    refreshToken: string;
-    user: { id: string; email: string; role: string };
-}
-
 /**
  * Admin ilə login olub token al
  */
@@ -27,11 +21,11 @@ export async function getAdminToken(): Promise<string> {
     });
 
     if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
+        const err = await res.json().catch(() => ({})) as any;
         throw new Error(`Login failed (${res.status}): ${JSON.stringify(err)}`);
     }
 
-    const data: LoginResponse = await res.json();
+    const data = await res.json() as any;
     return data.accessToken;
 }
 
@@ -57,7 +51,7 @@ export async function apiRequest(
     }
 
     const res = await fetch(`${API_BASE}${path}`, opts);
-    const data = await res.json().catch(() => null);
+    const data = await res.json().catch(() => null) as any;
     return { status: res.status, data };
 }
 

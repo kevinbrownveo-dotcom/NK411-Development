@@ -9,7 +9,7 @@ describe('Auth API', () => {
         });
 
         expect(res.status).toBe(200);
-        const data = await res.json();
+        const data: any = await res.json();
         expect(data.accessToken).toBeDefined();
         expect(data.user.email).toBe('admin@risk-registry.az');
         expect(data.user.role).toBe('admin');

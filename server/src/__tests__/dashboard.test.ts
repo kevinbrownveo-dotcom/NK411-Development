@@ -32,7 +32,7 @@ describe('Dashboard + Admin API', () => {
         it('GET /admin/users — istifadəçi siyahısı alır', async () => {
             const { status, data } = await apiRequest('GET', '/admin/users', token);
             expect(status).toBe(200);
-            expect(data.data).toBeInstanceOf(Array);
+            expect(Array.isArray(data.data)).toBe(true);
             expect(data.data.length).toBeGreaterThanOrEqual(1);
         });
     });
@@ -42,7 +42,7 @@ describe('Dashboard + Admin API', () => {
         it('GET /admin/roles — rol siyahısı alır', async () => {
             const { status, data } = await apiRequest('GET', '/admin/roles', token);
             expect(status).toBe(200);
-            expect(data).toBeInstanceOf(Array);
+            expect(Array.isArray(data)).toBe(true);
             expect(data.length).toBeGreaterThanOrEqual(1);
         });
     });
@@ -61,7 +61,7 @@ describe('Dashboard + Admin API', () => {
         it('GET /audit-log — audit jurnalı qaytarır', async () => {
             const { status, data } = await apiRequest('GET', '/audit-log', token);
             expect(status).toBe(200);
-            expect(data.data).toBeInstanceOf(Array);
+            expect(Array.isArray(data.data)).toBe(true);
         });
     });
 });

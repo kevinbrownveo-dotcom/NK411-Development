@@ -32,7 +32,7 @@ describe('CRUD Modules API', () => {
         it('GET /assets — siyahı alır', async () => {
             const { status, data } = await apiRequest('GET', '/assets', token);
             expect(status).toBe(200);
-            expect(data.data).toBeInstanceOf(Array);
+            expect(Array.isArray(data.data)).toBe(true);
             expect(data.pagination).toBeDefined();
             expect(data.pagination.total).toBeGreaterThanOrEqual(1);
         });
@@ -73,10 +73,10 @@ describe('CRUD Modules API', () => {
                 category: 'texniki',
                 source: 'kənardan',
                 purpose: ['xidmət_dayandırma'],
-                target_type: 'şəbəkə',
+                target_type: 'infrastruktur_komponenti',
                 intentionality: 'qərəzli',
                 severity: 'yüksək',
-                probability: 3,
+                probability: 45,
                 severity_law: 'yüksək',
                 probability_band_law: 'p41_60',
                 is_external: true,
@@ -105,8 +105,8 @@ describe('CRUD Modules API', () => {
                 severity_internal: 'kritik',
                 severity_law: 'yüksək',
                 detection_date: '2026-01-15',
-                detection_method: 'skaner',
-                exploitation_status: 'istismar_edilə_bilər',
+                detection_method: 'pentest',
+                exploitation_status: 'istifadə_olunmayıb',
                 status: 'açıq',
             });
 
@@ -157,9 +157,11 @@ describe('CRUD Modules API', () => {
                 req_title: 'ISO 27001 A.8.1',
                 req_category: 'standart',
                 req_description: 'Aktiv inventarının saxlanması',
-                source_type: 'ISO',
+                source_type: 'standart',
                 source_ref: 'ISO 27001:2022 A.8.1',
                 activity_area: ['aktiv_idarəetmə'],
+                owner_role: 'admin',
+                review_frequency: 'illik',
                 status: 'aktiv',
             });
 
@@ -180,7 +182,7 @@ describe('CRUD Modules API', () => {
         it('POST /incidents — yeni insident yaradır', async () => {
             const { status, data } = await apiRequest('POST', '/incidents', token, {
                 title: 'Phishing Email Kampaniyası',
-                type: 'phishing',
+                type: 'kiberhücum',
                 severity: 'P2_yüksək',
                 description: 'Əməkdaşlara saxta email göndərildi',
                 detection_datetime: '2026-02-01T08:00:00Z',
@@ -205,7 +207,7 @@ describe('CRUD Modules API', () => {
         it('GET /incidents/:id/actions — cavab addımlarını siyahılayır', async () => {
             const { status, data } = await apiRequest('GET', `/incidents/${incidentId}/actions`, token);
             expect(status).toBe(200);
-            expect(data).toBeInstanceOf(Array);
+            expect(Array.isArray(data)).toBe(true);
             expect(data.length).toBe(1);
         });
 

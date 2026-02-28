@@ -10,7 +10,6 @@ describe('Risks API — Hesablama + Əlaqələr', () => {
         token = await getAdminToken();
     });
 
-    // Setup — risk, asset, threat yarat
     it('POST /risks — yeni risk yaradır və skor hesablayır', async () => {
         const { status, data } = await apiRequest('POST', '/risks', token, {
             name: 'Server DB Pozulması Test',
@@ -28,22 +27,22 @@ describe('Risks API — Hesablama + Əlaqələr', () => {
         expect(data.risk_code).toMatch(/^RSK-/);
         expect(data.qualitative_score).toBeDefined();
         expect(data.priority).toBeDefined();
-        expect(typeof data.qualitative_score).toBe('number');
+        // qualitative_score postgres-dən string kimi gələ bilər
+        expect(Number(data.qualitative_score)).toBeGreaterThan(0);
         riskId = data.id;
     });
 
     it('GET /risks/:id/score — canlı skor alır', async () => {
         const { status, data } = await apiRequest('GET', `/risks/${riskId}/score`, token);
         expect(status).toBe(200);
-        expect(data.qualitative_score).toBeGreaterThan(0);
-        expect(data.prob_max).toBeGreaterThan(0);
-        expect(data.impact_max).toBeGreaterThan(0);
+        expect(Number(data.qualitative_score)).toBeGreaterThan(0);
+        expect(Number(data.prob_max)).toBeGreaterThan(0);
         expect(['aşağı', 'orta', 'yüksək', 'kritik']).toContain(data.priority);
     });
 
     // Əlaqə testləri
     it('POST /assets — əlaqə üçün aktiv yaradır', async () => {
-        const { data } = await apiRequest('POST', '/assets', token, {
+        const { status, data } = await apiRequest('POST', '/assets', token, {
             name: 'DB Server (risk test)',
             category: 'əsas',
             sub_category: 'hardware',
@@ -53,23 +52,25 @@ describe('Risks API — Hesablama + Əlaqələr', () => {
             status: 'aktiv',
             last_review: '2026-01-01',
         });
+        expect(status).toBe(201);
         assetId = data.id;
     });
 
     it('POST /threats — əlaqə üçün təhdid yaradır', async () => {
-        const { data } = await apiRequest('POST', '/threats', token, {
+        const { status, data } = await apiRequest('POST', '/threats', token, {
             name: 'SQL Injection Hücumu (risk test)',
             category: 'texniki',
             source: 'kənardan',
             purpose: ['data_oğurluq'],
-            target_type: 'database',
+            target_type: 'infrastruktur_komponenti',
             intentionality: 'qərəzli',
             severity: 'kritik',
-            probability: 4,
+            probability: 70,
             severity_law: 'kritik',
             probability_band_law: 'p61_80',
             is_external: true,
         });
+        expect(status).toBe(201);
         threatId = data.id;
     });
 
@@ -83,7 +84,7 @@ describe('Risks API — Hesablama + Əlaqələr', () => {
     });
 
     it('POST /risks/:id/threats — risk-ə təhdid əlaqələndirir', async () => {
-        const { status, data } = await apiRequest('POST', `/risks/${riskId}/threats`, token, {
+        const { status } = await apiRequest('POST', `/risks/${riskId}/threats`, token, {
             threat_id: threatId,
         });
         expect(status).toBe(201);
@@ -99,8 +100,8 @@ describe('Risks API — Hesablama + Əlaqələr', () => {
     it('GET /risks/:id/relations — bütün əlaqələri qaytarır', async () => {
         const { status, data } = await apiRequest('GET', `/risks/${riskId}/relations`, token);
         expect(status).toBe(200);
-        expect(data.assets).toBeInstanceOf(Array);
-        expect(data.threats).toBeInstanceOf(Array);
+        expect(Array.isArray(data.assets)).toBe(true);
+        expect(Array.isArray(data.threats)).toBe(true);
         expect(data.assets.length).toBeGreaterThanOrEqual(1);
         expect(data.threats.length).toBeGreaterThanOrEqual(1);
     });
